@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-reverse-engineering PUBLIC "-//Hibernate/Hibernate Reverse Engineering DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-reverse-engineering-3.0.dtd" >
+
+<hibernate-reverse-engineering>
+	<type-mapping>
+		<sql-type jdbc-type="INTEGER" hibernate-type="int"
+			not-null="true">
+		</sql-type>
+		<sql-type jdbc-type="VARCHAR" hibernate-type="string"
+			not-null="true">
+		</sql-type>
+	</type-mapping>
+	<table-filter match-name="IDP" match-catalog="PortalUser3"></table-filter>
+	<table catalog="PortalUser3" name="IDP">
+		<column name="idIDP"></column>
+		<column name="IDPName"></column>
+		<column name="IDPAddress"></column>
+		<column name="IDPLoginAddress"></column>
+		<column name="IDPParameterRequest"></column>
+		<column name="IDPAttributeRequest"></column>
+	</table>
+</hibernate-reverse-engineering>
