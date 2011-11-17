@@ -6,7 +6,7 @@
      <session-factory name="sessionFactory">
 		  <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
 		  <property name="hibernate.connection.password">pupass</property>
-		  <property name="hibernate.connection.url">jdbc:mysql://flyback.cnaf.infn.it/PortalUser</property>
+		  <property name="hibernate.connection.url">jdbc:mysql://localhost/PortalUser</property>
 		  <property name="hibernate.connection.username">pu</property>
 		  <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
 		  <property name="hibernate.show_sql">true</property>
