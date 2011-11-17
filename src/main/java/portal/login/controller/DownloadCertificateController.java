@@ -10,8 +10,6 @@ import java.security.cert.CertificateEncodingException;
 import org.apache.log4j.Logger;
 import org.globus.myproxy.MyProxy;
 import org.globus.myproxy.MyProxyException;
-import org.globus.gsi.GlobusCredential;
-import org.globus.gsi.GlobusCredentialException;
 import org.globus.gsi.X509Credential;
 import org.globus.gsi.gssapi.GlobusGSSCredentialImpl;
 import org.globus.util.Util;
