@@ -33,6 +33,7 @@
 <%@ page import="com.liferay.portal.kernel.util.ListUtil" %> 
 <%@ page import="com.liferay.portal.service.permission.PortalPermissionUtil" %>
 <%@ page import="com.liferay.portal.service.permission.PortletPermissionUtil"%> 
+<%@ page import="com.liferay.portal.model.User"%>
 <%@ page import="javax.portlet.PortletURL" %>
 
 <portlet:defineObjects />	
