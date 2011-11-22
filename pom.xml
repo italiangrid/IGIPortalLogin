@@ -42,7 +42,7 @@
 			</snapshots>
 			<id>myproxy</id>
 			<name>MyProxy API and Client</name>
-			<url>https://cilogon.svn.sourceforge.net/svnroot/cilogon/m2-repo/</url>
+			<url>http://community.ucs.indiana.edu:9090/archiva/repository/ogce.m2.all/</url>
 			<layout>default</layout>
 		</repository>
 	</repositories>
@@ -266,10 +266,16 @@
 			<artifactId>javaee-web-api</artifactId>
 			<version>6.0</version>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.jglobus</groupId>
 			<artifactId>myproxy</artifactId>
 			<version>2.0</version>
+		</dependency> -->
+		
+		<dependency>
+			<groupId>cog-jglobus</groupId>
+			<artifactId>cog-jglobus</artifactId>
+			<version>1.8.0</version>
 		</dependency>
 	</dependencies>
 	<properties>

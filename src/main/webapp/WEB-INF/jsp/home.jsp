@@ -25,6 +25,8 @@
 	message="proxy-download-success" />
 <liferay-ui:success key="proxy-destroy-success"
 	message="proxy-destroy-success" />
+<liferay-ui:success key="proxy-expired-deleted"
+	message="proxy-expired-deleted" />
 
 <liferay-ui:error key="proxy-download-problem"
 	message="proxy-download-problem" />

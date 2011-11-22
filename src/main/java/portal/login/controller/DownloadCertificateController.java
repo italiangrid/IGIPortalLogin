@@ -13,8 +13,10 @@ import org.springframework.web.portlet.bind.annotation.RenderMapping;
 
 import portal.login.domain.Certificate;
 import portal.login.domain.UserInfo;
+import portal.login.domain.Vo;
 import portal.login.services.CertificateService;
 import portal.login.services.UserInfoService;
+import portal.login.services.UserToVoService;
 
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.User;
@@ -48,6 +50,12 @@ public class DownloadCertificateController {
 	 * Attribute for access to the PortalUser database.
 	 */
 	@Autowired
+	private UserToVoService userToVoService;
+	
+	/**
+	 * Attribute for access to the PortalUser database.
+	 */
+	@Autowired
 	private CertificateService certificateService;
 
 	/**
@@ -68,6 +76,13 @@ public class DownloadCertificateController {
 		String username = ((User)request.getAttribute(WebKeys.USER)).getScreenName();
 		UserInfo userInfo = userInfoService.findByUsername(username);
 		return certificateService.findById(userInfo.getUserId());
+	}
+	
+	@ModelAttribute("userVos")
+	public List<Vo> getUserVos(RenderRequest request) {
+		String username = ((User)request.getAttribute(WebKeys.USER)).getScreenName();
+		UserInfo userInfo = userInfoService.findByUsername(username);
+		return userToVoService.findVoByUserId(userInfo.getUserId());
 	}
 
 }
