@@ -1,5 +1,4 @@
 package portal.login.controller;
-
 import java.util.List;
 
 import javax.portlet.RenderRequest;
@@ -68,16 +67,12 @@ public class DownloadCertificateController {
 		log.info("***** faccio il render *****");
 		return "downloadCertificate";
 	}
-
 	
-	
-	@ModelAttribute("certs")
-	public List<Certificate> getIdps(RenderRequest request) {
-		String username = ((User)request.getAttribute(WebKeys.USER)).getScreenName();
-		UserInfo userInfo = userInfoService.findByUsername(username);
-		return certificateService.findById(userInfo.getUserId());
-	}
-	
+	/**
+	 * Return to the portlet the list of the user's vo membership
+	 * @param request: session parameter
+	 * @return the list of the user's vo membership
+	 */
 	@ModelAttribute("userVos")
 	public List<Vo> getUserVos(RenderRequest request) {
 		String username = ((User)request.getAttribute(WebKeys.USER)).getScreenName();

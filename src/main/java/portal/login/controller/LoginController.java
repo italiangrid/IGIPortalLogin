@@ -8,6 +8,7 @@ import javax.portlet.RenderRequest;
 
 import portal.login.domain.Idp;
 import portal.login.domain.UserInfo;
+import portal.login.domain.UserToVo;
 import portal.login.domain.Vo;
 import portal.login.services.IdpService;
 import portal.login.services.UserInfoService;
@@ -27,35 +28,36 @@ import com.liferay.portal.model.User;
 import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.GlobusCredentialException;
 
+/**
+ * This class is the controller that authenticate the user and display some
+ * information about the downloaded proxyes.
+ * 
+ * @author dmichelotto
+ * 
+ */
+
 @Controller("userInfoController")
 @RequestMapping(value = "VIEW")
 public class LoginController {
-	
+
 	/**
 	 * Logger of the class DownloadCertificateController. TODO to substitute it
 	 * with slf4j.
 	 */
-	private static final Logger log = Logger
-			.getLogger(LoginController.class);
-
-	/**
-	 * Attribute the momorize if the proxy was downloaded. By default the
-	 * attrubite is false.
-	 */
-	private static boolean downloaded = false;
+	private static final Logger log = Logger.getLogger(LoginController.class);
 
 	/**
 	 * Attribute for access to the PortalUser database.
 	 */
 	@Autowired
 	private IdpService idpService;
-	
+
 	/**
 	 * Attribute for access to the PortalUser database.
 	 */
 	@Autowired
 	private UserInfoService userInfoService;
-	
+
 	/**
 	 * Attribute for access to the PortalUser database.
 	 */
@@ -84,42 +86,48 @@ public class LoginController {
 
 	/**
 	 * Present to the portlet if the grid proxy of the user was downloaded or
-	 * not
+	 * not, and destroy the proxy if expired.
 	 * 
 	 * @return the value of the attribute downloaded
 	 */
 	@ModelAttribute("proxyDownloaded")
 	public boolean getProxyDownloaded(RenderRequest request) {
-		
-		
+
 		User user = (User) request.getAttribute(WebKeys.USER);
-		if(user!=null){
+		if (user != null) {
 			String dir = System.getProperty("java.io.tmpdir");
-			log.info("Directory = "+ dir);
-			
-			
-			File proxyFile = new File(dir+"/users/"+user.getUserId()+"/x509up");
-			
-			if(proxyFile.exists()){
+			log.info("Directory = " + dir);
+
+			File proxyFile = new File(dir + "/users/" + user.getUserId()
+					+ "/x509up");
+
+			if (proxyFile.exists()) {
 				try {
-					GlobusCredential cred = new GlobusCredential(proxyFile.toString());
-					if(cred.getTimeLeft() > 0){
+					GlobusCredential cred = new GlobusCredential(
+							proxyFile.toString());
+					if (cred.getTimeLeft() > 0) {
 						return true;
-					}else{
-						UserInfo userInfo = userInfoService.findByUsername(user.getScreenName());
-						
-						File credFile = new File(dir+"/users/"+user.getUserId()+"/.cred");
+					} else {
+						UserInfo userInfo = userInfoService.findByUsername(user
+								.getScreenName());
+
+						File credFile = new File(dir + "/users/"
+								+ user.getUserId() + "/.cred");
 						File proxyVoFile = null;
 						credFile.delete();
 						proxyFile.delete();
 
-						List<Vo> vos = userToVoService.findVoByUserId(userInfo.getUserId());
-						for (Iterator<Vo> iterator = vos.iterator(); iterator.hasNext();) {
+						List<Vo> vos = userToVoService.findVoByUserId(userInfo
+								.getUserId());
+						for (Iterator<Vo> iterator = vos.iterator(); iterator
+								.hasNext();) {
 							Vo vo = (Vo) iterator.next();
-							proxyVoFile = new File(dir+"/users/"+user.getUserId()+"/x509up." + vo.getVo());
+							proxyVoFile = new File(dir + "/users/"
+									+ user.getUserId() + "/x509up."
+									+ vo.getVo());
 							proxyVoFile.delete();
 						}
-						
+
 						SessionMessages.add(request, "proxy-expired-deleted");
 					}
 				} catch (GlobusCredentialException e) {
@@ -128,28 +136,24 @@ public class LoginController {
 					log.info("e mò sono cazzi amari");
 				}
 			}
-				
+
 		}
 		return false;
 	}
+	
+	@ModelAttribute("voNumber")
+	public int getVoNumber(RenderRequest request) {
 
-	/**
-	 * Setter method for the attribute downloaded.
-	 * 
-	 * @param value
-	 *            is the value to assign to the attribute downloaded.
-	 */
-	public static void setDownloaded(boolean value) {
-		downloaded = value;
-	}
+		User user = (User) request.getAttribute(WebKeys.USER);
+		
+		
+		if (user != null) {
+			String username = user.getScreenName();
 
-	/**
-	 * Getter method for the attribute downloaded.
-	 * 
-	 * @return the value of the attribute.
-	 */
-	public static boolean getDownloaded() {
-		return downloaded;
+			UserInfo userInfo = userInfoService.findByUsername(username);
+			return userToVoService.findVoByUserId(userInfo.getUserId()).size();
+		}
+		return 0;
 	}
 
 }

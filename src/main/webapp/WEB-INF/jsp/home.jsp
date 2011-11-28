@@ -55,19 +55,56 @@
 			</strong>
 	
 	<c:if test="${!proxyDownloaded}">
-		<aui:form name="catalogForm" method="post"
-				action="${downloadCertificateUrl}">
-				<aui:button-row>
-					<aui:button type="submit" value="Download Proxy" />
-				</aui:button-row>
-			</aui:form>
+		<c:choose>
+		
+			<c:when test="${voNumber == 0 }">
+				<br/><br/>
+				<span style="color:red"><strong>Carica un certificato!!!</strong></span>
+				<br/><br/>
+			</c:when>
+			<c:when test="${voNumber == 1 }">
+				<portlet:actionURL var="getProxyUrl">
+					<portlet:param name="myaction" value="getProxy" />
+				</portlet:actionURL>
+				
+				<br/><br/>
+				
+				<aui:form name="addUserInfoForm" commandName="userInfo" method="post" action="${getProxyUrl}">
+	
+					<aui:input name="vosId" type="hidden"
+								value="0" />
+								
+					<aui:input name="proxyPass" type="password"
+								label="Proxy Password" />
+	
+					<aui:button-row>
+						<aui:button type="submit" value="Download"/>
+					</aui:button-row>
+				</aui:form>
+			</c:when>
+			<c:otherwise>
+				<aui:form name="catalogForm" method="post"
+						action="${downloadCertificateUrl}">
+						<aui:button-row>
+								<aui:button type="submit" value="Select VO" />
+						</aui:button-row>
+				</aui:form>
+			</c:otherwise>
+		</c:choose>
 	</c:if>
+
 	<c:if test="${proxyDownloaded}">
 		<aui:form name="catalogForm" method="post"
 				action="${downloadCertificateUrl}">
 				<aui:button-row>
-					<aui:button type="submit" value="Change Proxy" />
-					<aui:button type="button" value="Destroy Proxy" onClick="location.href='${destroyProxyUrl}';"/>
+					<c:choose>
+						<c:when test="${voNumber == 1 }">
+							<aui:button type="submit" value="Reload VO" />
+						</c:when>
+						<c:otherwise>
+							<aui:button type="submit" value="Change VO" />
+						</c:otherwise>
+					</c:choose>
 				</aui:button-row>
 			</aui:form>
 	</c:if>

@@ -24,7 +24,10 @@
 	<portlet:param name="myaction" value="getProxy" />
 </portlet:actionURL>
 
-<jsp:useBean id="certs" type="java.util.List<portal.login.domain.Certificate>" scope="request"></jsp:useBean>
+<portlet:renderURL var="homeUrl">
+	<portlet:param name="myaction" value="idps" />
+</portlet:renderURL>
+
 <jsp:useBean id="userVos" type="java.util.List<portal.login.domain.Vo>" scope="request"></jsp:useBean>
 
 <aui:form name="addUserInfoForm" commandName="userInfo" method="post"
@@ -36,29 +39,25 @@
 
 			<aui:column>
 			
-			<div name="default" id="<portlet:namespace/>default">
+			<c:if test="${fn:length(userVos) == 1}">	
+				<aui:input name="vosId" type="hidden"
+								value="0" />
+			</c:if>
+			
+			<c:if test="${fn:length(userVos) > 1}">
+			 
+			
+			<div id="<portlet:namespace/>default">
 				<a href="#moreOption" onclick="showMoreOption();">More Option</a>
 			</div>
 			
-			<div name="moreOption" id="<portlet:namespace/>moreOption" style="display: none;">
+			<div id="<portlet:namespace/>moreOption" style="display: none;">
 			
 				<a href="#default" onclick="hideMoreOption();">Hide More Option</a>
-			
-				<aui:select name="certsId" label="Certificati">
-									
-					<aui:option value="0"><liferay-ui:message key="Default"/></aui:option>
-					
-					<c:forEach var="cert" items="${certs}">
-						
-						<aui:option value="${cert.idCert}"><liferay-ui:message key="${cert.subject}"/></aui:option> 	
-	
-					</c:forEach>
-					
-				</aui:select>
 				
 				<aui:select name="vosId" label="VOs">
 									
-					<aui:option value="0"><liferay-ui:message key="Default"/></aui:option>
+					<aui:option value="0" selected="selected"><liferay-ui:message key="Default"/></aui:option>
 					
 					<c:forEach var="userVo" items="${userVos}">
 						
@@ -69,7 +68,7 @@
 				</aui:select>
 			
 			</div>
-
+			</c:if>
 			<aui:input name="proxyPass" type="password"
 							label="Proxy Password" />
 
@@ -77,6 +76,8 @@
 
 			<aui:button-row>
 				<aui:button type="submit" value="Download"/>
+				<aui:button type="cancel" value="Back"
+						onClick="location.href='${homeUrl}';" />
 			</aui:button-row>
 
 		</aui:fieldset>
