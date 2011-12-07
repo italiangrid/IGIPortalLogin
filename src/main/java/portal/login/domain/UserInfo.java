@@ -215,16 +215,16 @@ public class UserInfo implements java.io.Serializable {
 	}
 
 	/**
-	 * Setter method for the user identifier.
-	 * @param userId: identifiert to set.
+	 * Setter method for institute of the user.
+	 * @param institute: institute of the user.
 	 */
 	public void setInstitute(String institute) {
 		this.institute = institute;
 	}
 
 	/**
-	 * Getter method for the user identifier.
-	 * @return the identifier-
+	 * Getter method for the phone number of the user.
+	 * @return the phone number.
 	 */
 	@Column(name = "phone", length = 75)
 	public String getPhone() {
@@ -232,16 +232,16 @@ public class UserInfo implements java.io.Serializable {
 	}
 
 	/**
-	 * Setter method for the user identifier.
-	 * @param userId: identifiert to set.
+	 * Setter method for the phone number of the user.
+	 * @param phone: phone number of the user to set.
 	 */
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
 
 	/**
-	 * Getter method for the user identifier.
-	 * @return the identifier-
+	 * Getter method for the mail address of the user.
+	 * @return mail address of the user.
 	 */
 	@Column(name = "mail", nullable = false, length = 75)
 	public String getMail() {
@@ -249,16 +249,16 @@ public class UserInfo implements java.io.Serializable {
 	}
 
 	/**
-	 * Setter method for the user identifier.
-	 * @param userId: identifiert to set.
+	 * Setter method for the mail address of the user.
+	 * @param mail: mail address of the user to set.
 	 */
 	public void setMail(String mail) {
 		this.mail = mail;
 	}
 
 	/**
-	 * Getter method for the user identifier.
-	 * @return the identifier-
+	 * Getter method for the username of the user.
+	 * @return the username of the user.
 	 */
 	@Column(name = "username", nullable = false, length = 75)
 	public String getUsername() {
@@ -266,16 +266,16 @@ public class UserInfo implements java.io.Serializable {
 	}
 
 	/**
-	 * Setter method for the user identifier.
-	 * @param userId: identifiert to set.
+	 * Setter method for  username of the user.
+	 * @param username:  username of the user to set.
 	 */
 	public void setUsername(String username) {
 		this.username = username;
 	}
 
 	/**
-	 * Getter method for the user identifier.
-	 * @return the identifier-
+	 * Getter method for the flag that identify if the user have completed the registration process.
+	 * @return the value of the flag, true if the user have completed the registration process.
 	 */
 	@Column(name = "registrationComplete", nullable = false, length = 5)
 	public String getRegistrationComplete() {
@@ -283,16 +283,16 @@ public class UserInfo implements java.io.Serializable {
 	}
 
 	/**
-	 * Setter method for the user identifier.
-	 * @param userId: identifiert to set.
+	 * Setter method for the flag that identify if the user have completed the registration process.
+	 * @param registrationComplete: the value to set.
 	 */
 	public void setRegistrationComplete(String registrationComplete) {
 		this.registrationComplete = registrationComplete;
 	}
 
 	/**
-	 * Getter method for the user identifier.
-	 * @return the identifier-
+	 * Getter method for the set of certificates of the user.
+	 * @return the set of certificates.
 	 */
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "userInfo")
 	public Set<Certificate> getCertificates() {
@@ -300,16 +300,16 @@ public class UserInfo implements java.io.Serializable {
 	}
 
 	/**
-	 * Setter method for the user identifier.
-	 * @param userId: identifiert to set.
+	 * Setter method for the set of certificates of the user.
+	 * @param certificates: the set to set.
 	 */
 	public void setCertificates(Set<Certificate> certificates) {
 		this.certificates = certificates;
 	}
 
 	/**
-	 * Getter method for the user identifier.
-	 * @return the identifier-
+	 * Getter method for the set of UserToVo of the user.
+	 * @return the set of UserTo Vo.
 	 */
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "userInfo")
 	public Set<UserToVo> getUserToVos() {
@@ -317,8 +317,8 @@ public class UserInfo implements java.io.Serializable {
 	}
 
 	/**
-	 * Setter method for the user identifier.
-	 * @param userId: identifiert to set.
+	 * Setter method for the set of UserToVo of the user.
+	 * @param userToVo: the set to set.
 	 */
 	public void setUserToVos(Set<UserToVo> userToVos) {
 		this.userToVos = userToVos;

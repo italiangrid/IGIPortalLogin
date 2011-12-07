@@ -1,11 +1,14 @@
 package portal.login.controller;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.security.cert.CertificateEncodingException;
 import java.util.Iterator;
@@ -27,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.bind.annotation.ActionMapping;
 
 import portal.login.domain.UserInfo;
+import portal.login.domain.UserToVo;
 import portal.login.domain.Vo;
 import portal.login.services.UserInfoService;
 import portal.login.services.UserToVoService;
@@ -105,45 +109,27 @@ public class GetProxyController {
 		//int cert = Integer.parseInt(request.getParameter("certsId"));
 		int vo = Integer.parseInt(request.getParameter("vosId"));
 		String pass = (String) request.getParameter("proxyPass");
+		String role = (String) request.getParameter("fqan");
+		
+		log.info("role = " + role);
 
 		String username = user.getScreenName();
 
 		UserInfo userInfo = userInfoService.findByUsername(username);
-
-		/*if (cert == 0) {
-			Certificate certificate = null;
-			List<Certificate> certs = certificateService.findById(userInfo
-					.getUserId());
-			for (Iterator<Certificate> iterator = certs.iterator(); iterator
-					.hasNext();) {
-				certificate = (Certificate) iterator.next();
-				if (certificate.getPrimaryCert().equals("true"))
-					break;
-			}
-			cert = certificate.getIdCert();
-		}*/
-		//String voname = null;
-		
-		Vo selectedVo = null;
-		
-		
-		
-
-		if (vo == 0) {
-			String voname = userToVoService.findDefaultVo(userInfo.getUserId());
+		Vo selectedVo =null;
+		if(vo == 0){
+			String tmp = userToVoService.findDefaultVo(userInfo.getUserId());
 			List<Vo> vos = userToVoService.findVoByUserId(userInfo.getUserId());
-		
-			for (Iterator<Vo> iterator = vos.iterator(); iterator.hasNext();) {
-				selectedVo =  iterator.next();
-				
-				if(selectedVo.getVo().equals(voname));
+			for (Iterator iterator = vos.iterator(); iterator.hasNext();) {
+				Vo vo2 = (Vo) iterator.next();
+				if(tmp.equals(vo2.getVo())){
+					selectedVo = vo2;
 					break;
-				
+				}
 			}
-		} else {
+		}else{
 			selectedVo = voService.findById(vo);
 		}
-		
 		int cert = userToVoService.findById(userInfo.getUserId(), selectedVo.getIdVo()).getCertificate().getIdCert();
 		
 
@@ -170,10 +156,15 @@ public class GetProxyController {
 			out = new FileOutputStream(proxyFile);
 			Util.setFilePermissions(proxyFile.toString(), 600);
 			globusCred.save(out);
+			
+			myVomsProxyInit(proxyFile.toString(), selectedVo.getVo(), role, request);
 
 			out = new FileOutputStream(proxyFileVO);
 			Util.setFilePermissions(proxyFileVO.toString(), 600);
 			globusCred.save(out);
+			
+			myVomsProxyInit(proxyFileVO.toString(), selectedVo.getVo(), role, request);
+
 
 			FileWriter fstream = new FileWriter(dir + "/users/"
 					+ user.getUserId() + "/.cred", true);
@@ -199,7 +190,7 @@ public class GetProxyController {
 			response.setRenderParameter("myaction", "idps");
 
 		} catch (FileNotFoundException e) {
-			log.error("Could not write credential to file "
+			log.info("Could not write credential to file "
 					+ proxyFile.getAbsolutePath() + ": " + e.getMessage());
 			throw new IOException(e.getMessage());
 
@@ -208,12 +199,62 @@ public class GetProxyController {
 				try {
 					out.close();
 				} catch (IOException e) {
-					log.error("Could not write credential to file "
+					log.info("Could not write credential to file "
 							+ proxyFile.getAbsolutePath() + ": "
 							+ e.getMessage());
 					throw e;
 				}
 			}
+		}
+	}
+	
+	private boolean myVomsProxyInit(String proxyFile, String voms, String role, ActionRequest request){
+		try {
+			
+			User user = (User) request.getAttribute(WebKeys.USER);
+
+			String dir = System.getProperty("java.io.tmpdir");
+			log.info("Directory = " + dir);
+
+			String proxy = dir + "/users/" + user.getUserId() + "/x509up";
+			
+			String cmd = "voms-proxy-init -noregen -cert " + proxy + " -key " + proxy + " -out " + proxyFile + " -voms " + voms;
+		
+			if(!role.equals("norole")){
+				cmd += ":" + role;
+			}
+			log.info("cmd = " + cmd);
+			Process p = Runtime.getRuntime().exec(cmd);
+			InputStream stdout = p.getInputStream();
+			InputStream stderr = p.getErrorStream();
+
+			BufferedReader output = new BufferedReader(new InputStreamReader(
+					stdout));
+			String line = null;
+
+			while ((line = output.readLine()) != null) {
+				log.info("[Stdout] " + line);
+			}
+			output.close();
+			
+			//boolean error = false;
+
+			BufferedReader brCleanUp = new BufferedReader(
+					new InputStreamReader(stderr));
+			while ((line = brCleanUp.readLine()) != null) {
+				//error= true;
+				log.error("[Stderr] " + line);
+			}
+			/*if(error)
+				SessionErrors.add(request, "voms-proxy-init-problem");*/
+			brCleanUp.close();
+			
+			return true;
+
+		} catch (IOException e) {
+			SessionErrors.add(request, "voms-proxy-init-exception");
+			e.printStackTrace();
+			return false;
 		}
 	}
 

@@ -6,6 +6,7 @@
 		<portlet-name>Login</portlet-name>
 		<instanceable>true</instanceable>
 		<header-portlet-css>/css/main.css</header-portlet-css>
+		<header-portal-javascript>/Registration-4/js/jquery-1.6.1.min.js</header-portal-javascript>
 		<footer-portlet-javascript>/js/main.js</footer-portlet-javascript>
 	</portlet>
 	<role-mapper>

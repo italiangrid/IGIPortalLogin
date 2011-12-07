@@ -1,8 +1,15 @@
 package portal.login.controller;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
 import javax.portlet.RenderResponse;
 import javax.portlet.RenderRequest;
 
@@ -21,6 +28,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
 
+import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.User;
@@ -125,7 +133,10 @@ public class LoginController {
 							proxyVoFile = new File(dir + "/users/"
 									+ user.getUserId() + "/x509up."
 									+ vo.getVo());
-							proxyVoFile.delete();
+							cred = new GlobusCredential(
+									proxyVoFile.toString());
+							if(cred.getTimeLeft() <= 0)
+								proxyVoFile.delete();
 						}
 
 						SessionMessages.add(request, "proxy-expired-deleted");
@@ -154,6 +165,133 @@ public class LoginController {
 			return userToVoService.findVoByUserId(userInfo.getUserId()).size();
 		}
 		return 0;
+	}
+	
+	/**
+	 * Return to the portlet the list of the user's fqans.
+	 * @param request: session parameter.
+	 * @return the list of the user's fqans.
+	 */
+	@ModelAttribute("userFqans")
+	public String getUserFqans(RenderRequest request) {
+		User user = (User)request.getAttribute(WebKeys.USER);
+		if(user!=null){
+			UserInfo userInfo = userInfoService.findByUsername(user.getScreenName());
+			if(userToVoService.findVoByUserId(userInfo.getUserId()).size()==1){
+				List<UserToVo> utvs = userToVoService.findById(userInfo.getUserId());
+				UserToVo utv = utvs.get(0);
+				return utv.getFqans();
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Return to the portlet the list of the user's fqans.
+	 * @param request: session parameter.
+	 * @return the list of the user's fqans.
+	 * @throws GlobusCredentialException 
+	 */
+	@ModelAttribute("proxys")
+	public String getProxys(RenderRequest request) throws GlobusCredentialException {
+		String result = "";
+		User user = (User)request.getAttribute(WebKeys.USER);
+		if(user!=null){
+			UserInfo userInfo = userInfoService.findByUsername(user.getScreenName());
+			List<Vo> vos = userToVoService.findVoByUserId(userInfo
+					.getUserId());
+			String dir = System.getProperty("java.io.tmpdir");
+			File proxyVoFile = null;
+			for (Iterator<Vo> iterator = vos.iterator(); iterator
+					.hasNext();) {
+				Vo vo = (Vo) iterator.next();
+				proxyVoFile = new File(dir + "/users/"
+						+ user.getUserId() + "/x509up."
+						+ vo.getVo());
+				
+				if(proxyVoFile.exists()){
+					
+					GlobusCredential cred = new GlobusCredential(
+							proxyVoFile.toString());
+					if (cred.getTimeLeft() <= 0) {
+						proxyVoFile.delete();
+						SessionMessages.add(request, "proxy-expired-deleted");
+					}else{
+						String role="             no role setted";
+						try {
+							
+							UserToVo utv = userToVoService.findById(userInfo.getUserId(), vo.getIdVo());
+							
+							String toParse = utv.getFqans();
+							String roles[]=null;
+							if(toParse!=null){
+								roles=toParse.split(";");
+							}
+							
+							log.info("Directory = " + dir);
+
+							//String proxy = dir + "/users/" + user.getUserId() + "/x509up";
+							
+							String cmd = "voms-proxy-info -all -file " + proxyVoFile.toString();
+							
+							log.info("cmd = " + cmd);
+							Process p = Runtime.getRuntime().exec(cmd);
+							InputStream stdout = p.getInputStream();
+							InputStream stderr = p.getErrorStream();
+
+							BufferedReader output = new BufferedReader(new InputStreamReader(
+									stdout));
+							String line = null;
+
+							while ((line = output.readLine()) != null) {
+								log.info("[Stdout] " + line);
+								if(roles!=null){
+									for(int i=0; i<roles.length; i++){
+										if(line.contains(roles[i])){
+											role=roles[i];
+										}
+									}
+								}
+							}
+							output.close();
+							
+							//boolean error = false;
+
+							BufferedReader brCleanUp = new BufferedReader(
+									new InputStreamReader(stderr));
+							while ((line = brCleanUp.readLine()) != null) {
+								//error= true;
+								log.error("[Stderr] " + line);
+							}
+							/*if(error)
+								SessionErrors.add(request, "voms-proxy-init-problem");*/
+							brCleanUp.close();
+							
+							
+
+						} catch (IOException e) {
+							SessionErrors.add(request, "voms-proxy-init-exception");
+							e.printStackTrace();
+						}
+						
+						long totalSecs =cred.getTimeLeft();
+						long hours = totalSecs / 3600;
+						long minutes = (totalSecs % 3600) / 60;
+						long seconds = totalSecs % 60;
+						
+						String timeLeft = hours + ":" + minutes +  ":" + seconds;
+						if(hours < 1)
+							timeLeft = "<span style=\"color:red\"><strong>" + timeLeft + "</strong></span>";
+						else
+							timeLeft = "<span style=\"color:#63AC68\"><strong>" + timeLeft + "</strong></span>";
+						
+						
+						result += "<tr><td><strong>VO:</strong> " + vo.getVo() + "&nbsp&nbsp</td><td> <strong>Ruolo:</strong>&nbsp&nbsp</td><td> " + role + "</td></tr><tr><td>&nbsp&nbsp</td><td> <strong>TimeLeft:</strong>&nbsp&nbsp</td><td> " + timeLeft + "</td></tr>";
+					}
+				}
+			}
+		}
+		return result;
 	}
 
 }

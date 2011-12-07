@@ -1,5 +1,8 @@
 package portal.login.controller;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import javax.portlet.RenderRequest;
 
@@ -12,6 +15,7 @@ import org.springframework.web.portlet.bind.annotation.RenderMapping;
 
 import portal.login.domain.Certificate;
 import portal.login.domain.UserInfo;
+import portal.login.domain.UserToVo;
 import portal.login.domain.Vo;
 import portal.login.services.CertificateService;
 import portal.login.services.UserInfoService;
@@ -79,5 +83,45 @@ public class DownloadCertificateController {
 		UserInfo userInfo = userInfoService.findByUsername(username);
 		return userToVoService.findVoByUserId(userInfo.getUserId());
 	}
-
+	
+	/**
+	 * Return to the portlet the list of the user's vo membership
+	 * @param request: session parameter
+	 * @return the list of the user's vo membership
+	 */
+	@ModelAttribute("defaultVo")
+	public String defaultVo(RenderRequest request) {
+		String username = ((User)request.getAttribute(WebKeys.USER)).getScreenName();
+		UserInfo userInfo = userInfoService.findByUsername(username);
+		return userToVoService.findDefaultVo(userInfo.getUserId());
+	}
+	
+	/**
+	 * Return to the portlet the list of the user's fqans.
+	 * @param request: session parameter.
+	 * @return the list of the user's fqans.
+	 */
+	@ModelAttribute("userFqans")
+	public Map<Object,Object> getUserFqans(RenderRequest request) {
+		String username = ((User)request.getAttribute(WebKeys.USER)).getScreenName();
+		UserInfo userInfo = userInfoService.findByUsername(username);
+		
+		List<UserToVo> utv = userToVoService.findById(userInfo.getUserId());
+		
+		Map<Object, Object> x = new Properties();
+		
+		String toParse = null;
+		
+		for (Iterator<UserToVo> iterator = utv.iterator(); iterator.hasNext();) {
+			UserToVo userToVo = iterator.next();
+			toParse = userToVo.getFqans();
+			if(toParse != null){
+				x.put(userToVo.getId().getIdVo(), toParse);
+				log.info(userToVo.getId().getIdVo() + " --> " + toParse);
+			}
+		}
+		
+		return x;
+	}
+	
 }
