@@ -1,5 +1,4 @@
 <%@ include file="/WEB-INF/jsp/init.jsp"%>
-<script src="http://code.jquery.com/jquery-1.6.1.min.js"></script>
 
 <script type="text/javascript">
 <!--
@@ -70,7 +69,11 @@
 
 			<aui:column>
 			
-			<c:if test="${fn:length(userVos) == 1}">	
+			<c:if test="${fn:length(userVos) == 1}">
+				<strong>VO <c:forEach var="userVo" items="${userVos}"><c:out value="${userVo.vo }"></c:out></c:forEach> </strong>
+				<br/>
+				Inserisci la tua password.
+				<br/>	
 				<aui:input name="vosId" type="hidden"
 								value="0" />
 			</c:if>
@@ -78,7 +81,8 @@
 			<c:if test="${fn:length(userVos) > 1}">
 				
 				
-				<select id="<portlet:namespace/>vosId" name="<portlet:namespace/>vosId" label="VOs" onChange="showRoleList();">
+				<strong>Seleziona la VO:</storng><br/>
+				<select id="<portlet:namespace/>vosId" name="<portlet:namespace/>vosId" onChange="showRoleList();">
 					
 					<c:forEach var="userVo" items="${userVos}">
 						

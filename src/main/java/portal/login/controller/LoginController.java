@@ -7,12 +7,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
+import javax.portlet.PortletURL;
 import javax.portlet.RenderResponse;
 import javax.portlet.RenderRequest;
-
 import portal.login.domain.Idp;
 import portal.login.domain.UserInfo;
 import portal.login.domain.UserToVo;
@@ -32,7 +29,6 @@ import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.User;
-
 import org.globus.gsi.GlobusCredential;
 import org.globus.gsi.GlobusCredentialException;
 
@@ -193,7 +189,7 @@ public class LoginController {
 	 * @throws GlobusCredentialException 
 	 */
 	@ModelAttribute("proxys")
-	public String getProxys(RenderRequest request) throws GlobusCredentialException {
+	public String getProxys(RenderRequest request, RenderResponse response) throws GlobusCredentialException {
 		String result = "";
 		User user = (User)request.getAttribute(WebKeys.USER);
 		if(user!=null){
@@ -217,7 +213,7 @@ public class LoginController {
 						proxyVoFile.delete();
 						SessionMessages.add(request, "proxy-expired-deleted");
 					}else{
-						String role="             no role setted";
+						String role="             no role";
 						try {
 							
 							UserToVo utv = userToVoService.findById(userInfo.getUserId(), vo.getIdVo());
@@ -285,8 +281,23 @@ public class LoginController {
 						else
 							timeLeft = "<span style=\"color:#63AC68\"><strong>" + timeLeft + "</strong></span>";
 						
+						PortletURL url = response.createRenderURL();
+						url.setParameter("myaction", "showRenewProxy");
+						url.setParameter("idVo", Integer.toString(vo.getIdVo()));
+						String button = "<input type=\"submit\" value=\"Renew\" onClick=\"location.href=\'"+url+"\';\"></input>";
 						
-						result += "<tr><td><strong>VO:</strong> " + vo.getVo() + "&nbsp&nbsp</td><td> <strong>Ruolo:</strong>&nbsp&nbsp</td><td> " + role + "</td></tr><tr><td>&nbsp&nbsp</td><td> <strong>TimeLeft:</strong>&nbsp&nbsp</td><td> " + timeLeft + "</td></tr>";
+						result += "<tr>" +
+									"<td colspan=\"3\" style=\"color: #000080\" align=\"center\"><strong>VO: " + vo.getVo() + "</strong></td>" +
+								  "</tr>" +
+								  "<tr>" +
+								    "<td> <strong>Ruolo:</strong>&nbsp&nbsp</td>" +
+								    "<td> " + role + "&nbsp&nbsp</td>" +
+								    "<td rowspan=\"2\" align=\"right\">" + button + "</td>" +
+								  "</tr>" +
+								  "<tr>" +
+								    "<td> <strong>TimeLeft:</strong>&nbsp&nbsp</td>" +
+								    "<td>" + timeLeft + "</td>" +
+								  "</tr> *";
 					}
 				}
 			}

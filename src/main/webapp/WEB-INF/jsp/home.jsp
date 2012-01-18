@@ -51,6 +51,7 @@
 <portlet:actionURL var="destroyProxyUrl">
 	<portlet:param name="myaction" value="destroyProxy" />
 </portlet:actionURL>
+								 		 
 
 <liferay-portlet:renderURL plid="11820" portletName="Registration_WAR_Registration4_INSTANCE_Lt2J" var="vaiqui"/>
 
@@ -125,10 +126,10 @@
 					<br/> Non hai scaricato proxy usa il pulsante qui sotto per effettuare il download <br/> 
 				</c:if>
 				
-				<table border="0">
+				<table border="0" width="100%">
 				<tr><td>&nbsp</td><td>&nbsp</td><td>&nbsp</td></tr>
 				<c:forTokens items="${proxys}"
-			                 delims=";"
+			                 delims="*"
 			                 var="currentName"
 			                 varStatus="status">
 			      
@@ -183,10 +184,10 @@
 				<c:if test="${fn:length(proxys)==0}">
 					<br/> Non hai scaricato proxy usa il pulsante qui sotto per effettuare il download <br/> 
 				</c:if>
-				<table>
+				<table border="0" width="100%">
 				<tr><td>&nbsp</td><td>&nbsp</td><td>&nbsp</td></tr>
 				<c:forTokens items="${proxys}"
-			                 delims=";"
+			                 delims="*"
 			                 var="currentName"
 			                 varStatus="status">
 			      
@@ -195,9 +196,11 @@
 			    </table>
 				<aui:form name="catalogForm" method="post"
 						action="${downloadCertificateUrl}">
-						<aui:button-row>
-								<aui:button type="submit" value="VO settings" />
-						</aui:button-row>
+						
+							<aui:button-row>
+									<aui:button type="submit" value="Get proxy" />
+							</aui:button-row>
+						
 				</aui:form>
 			</c:otherwise>
 		</c:choose>
@@ -206,25 +209,30 @@
 	<c:if test="${proxyDownloaded}">
 		<u>Proxy scaricati:</u><br/>
 		
-		
-		<table border="0">
+		<c:set var="count" value="0" />
+		<table border="0" width="100%">
 		<tr><td>&nbsp</td><td>&nbsp</td><td>&nbsp</td></tr>
+		
+
 		<c:forTokens items="${proxys}"
-	                 delims=";"
+	                 delims="*"
 	                 var="currentName"
 	                 varStatus="status">
 	      
 	        
 	        <c:out escapeXml="false" value="${currentName}"/>
-	        
+	        <c:set var="count" value="${status.count}" />
 	    </c:forTokens>
 	    </table>
 	<br/>
+		<c:if test="${(count) < voNumber}">
 		<aui:form name="catalogForm" method="post"
 				action="${downloadCertificateUrl}">
-				<aui:button-row>
-					<aui:button type="submit" value="VO Settings" />
-				</aui:button-row>
-			</aui:form>
+			<aui:button-row>
+					<aui:button type="submit" value="Get proxy for other VO" />	
+			</aui:button-row>
+					
+		</aui:form>
+		</c:if>
 	</c:if>
 </c:if>

@@ -3,6 +3,7 @@ package portal.login.controller;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -13,6 +14,7 @@ import java.io.OutputStream;
 import java.security.cert.CertificateEncodingException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -30,7 +32,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.bind.annotation.ActionMapping;
 
 import portal.login.domain.UserInfo;
-import portal.login.domain.UserToVo;
 import portal.login.domain.Vo;
 import portal.login.services.UserInfoService;
 import portal.login.services.UserToVoService;
@@ -92,8 +93,25 @@ public class GetProxyController {
 	public void getProxy(ActionRequest request, ActionResponse response)
 			throws IOException, CertificateEncodingException {
 		log.info("***** Pronto per scaricare il proxy *****");
+		
+		
+		
+		String contextPath = GetProxyController.class.getClassLoader().getResource("").getPath();
+		
+		log.info("dove sono:" + contextPath);
+		
+		FileInputStream inStream =
+	    new FileInputStream(contextPath + "/content/MyProxy.properties");
 
-		MyProxy mp = new MyProxy("halfback.cnaf.infn.it", 7512);
+		Properties prop = new Properties();
+		prop.load(inStream);
+		inStream.close();
+		
+		String host = prop.getProperty("host");
+		
+		log.info("Host = " + host);
+
+		MyProxy mp = new MyProxy(host, 7512);
 		User user = (User) request.getAttribute(WebKeys.USER);
 
 		String dir = System.getProperty("java.io.tmpdir");
@@ -120,7 +138,7 @@ public class GetProxyController {
 		if(vo == 0){
 			String tmp = userToVoService.findDefaultVo(userInfo.getUserId());
 			List<Vo> vos = userToVoService.findVoByUserId(userInfo.getUserId());
-			for (Iterator iterator = vos.iterator(); iterator.hasNext();) {
+			for (Iterator<Vo> iterator = vos.iterator(); iterator.hasNext();) {
 				Vo vo2 = (Vo) iterator.next();
 				if(tmp.equals(vo2.getVo())){
 					selectedVo = vo2;
@@ -218,8 +236,8 @@ public class GetProxyController {
 
 			String proxy = dir + "/users/" + user.getUserId() + "/x509up";
 			
-			String cmd = "voms-proxy-init -noregen -cert " + proxy + " -key " + proxy + " -out " + proxyFile + " -voms " + voms;
-		
+			String cmd = "voms-proxy-init -noregen -cert " + proxy + " -key " + proxy + " -out " + proxyFile + " -valid 96:00 -voms " + voms;
+			//log.error(cmd);
 			if(!role.equals("norole")){
 				cmd += ":" + role;
 			}
@@ -243,7 +261,9 @@ public class GetProxyController {
 					new InputStreamReader(stderr));
 			while ((line = brCleanUp.readLine()) != null) {
 				//error= true;
-				log.error("[Stderr] " + line);
+				if(!line.contains("....")){
+					log.error("[Stderr] " + line);
+				}
 			}
 			/*if(error)
 				SessionErrors.add(request, "voms-proxy-init-problem");*/
