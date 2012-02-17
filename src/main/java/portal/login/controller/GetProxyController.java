@@ -31,8 +31,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.bind.annotation.ActionMapping;
 
+import portal.login.domain.Certificate;
 import portal.login.domain.UserInfo;
 import portal.login.domain.Vo;
+import portal.login.services.CertificateService;
 import portal.login.services.UserInfoService;
 import portal.login.services.UserToVoService;
 import portal.login.services.VoService;
@@ -78,6 +80,12 @@ public class GetProxyController {
 	 */
 	@Autowired
 	private UserToVoService userToVoService;
+	
+	/**
+	 * Attribute for access to the PortalUser database.
+	 */
+	@Autowired
+	private CertificateService certificateService;
 
 	/**
 	 * Writes the specified globus credential to disk.
@@ -108,8 +116,10 @@ public class GetProxyController {
 		inStream.close();
 		
 		String host = prop.getProperty("host");
+		String valid = prop.getProperty("valid");
 		
 		log.info("Host = " + host);
+		log.info("Valid = " + valid);
 
 		MyProxy mp = new MyProxy(host, 7512);
 		User user = (User) request.getAttribute(WebKeys.USER);
@@ -148,20 +158,27 @@ public class GetProxyController {
 		}else{
 			selectedVo = voService.findById(vo);
 		}
-		int cert = userToVoService.findById(userInfo.getUserId(), selectedVo.getIdVo()).getCertificate().getIdCert();
+		int idCert = userToVoService.findById(userInfo.getUserId(), selectedVo.getIdVo()).getCertificate().getIdCert();
+		
+		Certificate cert = certificateService.findByIdCert(idCert);
+		
 		
 
 		File proxyFile = new File(dir + "/users/" + user.getUserId()
 				+ "/x509up");
+		/*File myproxyFile = new File(dir + "/users/" + user.getUserId()
+				+ "/x509uplong");*/
 		File proxyFileVO = new File(dir + "/users/" + user.getUserId()
 				+ "/x509up." + selectedVo.getVo());
+		
 
 		try {
 
-			log.info("certificato: " + username + "_" + cert + " password: "
+			log.info("certificato: " + cert.getUsernameCert() + " password: "
 					+ pass);
-			GSSCredential proxy = mp.get(username + "_" + cert, pass,
-					100 * 3600);
+			GSSCredential proxy = mp.get(cert.getUsernameCert(), pass, 608400);
+					//100 * 3600);
+			//GSSCredential myproxy = mp.get(cert.getUsernameCert(), pass, 608400);
 			log.info("----- All ok -----");
 			log.info("Proxy:" + proxy.toString());
 
@@ -175,20 +192,31 @@ public class GetProxyController {
 			Util.setFilePermissions(proxyFile.toString(), 600);
 			globusCred.save(out);
 			
-			myVomsProxyInit(proxyFile.toString(), selectedVo.getVo(), role, request);
+			/*GlobusCredential myproxyCred = null;
+			myproxyCred = ((GlobusGSSCredentialImpl) myproxy)
+					.getGlobusCredential();
+			out = new FileOutputStream(myproxyFile);
+			Util.setFilePermissions(myproxyFile.toString(), 600);
+			myproxyCred.save(out);*/
+			
+			myMyProxyInit(proxyFile.toString(), host, cert.getSubject(), pass, request);
+			
+			//myproxyFile.delete();
+			
+			//myVomsProxyInit(proxyFile.toString(), selectedVo.getVo(), role, request);
 
 			out = new FileOutputStream(proxyFileVO);
 			Util.setFilePermissions(proxyFileVO.toString(), 600);
 			globusCred.save(out);
 			
-			myVomsProxyInit(proxyFileVO.toString(), selectedVo.getVo(), role, request);
+			myVomsProxyInit(proxyFileVO.toString(), selectedVo.getVo(), role, valid, request);
 
 
 			FileWriter fstream = new FileWriter(dir + "/users/"
 					+ user.getUserId() + "/.cred", true);
 			BufferedWriter outcred = new BufferedWriter(fstream);
 			outcred.write(System.currentTimeMillis()
-					+ ";halfback.cnaf.infn.it;" + globusCred.getTimeLeft()
+					+ ";"+host+";" + globusCred.getTimeLeft()
 					+ "; ;#" + selectedVo.getVo() + "\n");
 			// Close the output stream
 			outcred.close();
@@ -198,17 +226,17 @@ public class GetProxyController {
 		} catch (MyProxyException e) {
 			//e.printStackTrace();
 			SessionErrors.add(request, "proxy-download-problem");
-			log.info("***** errore myproxy " + e.getMessage()
+			log.error("***** errore myproxy " + e.getMessage()
 					+ " MyProxyException *****");
 			response.setRenderParameter("myaction", "idps");
 
 		} catch (IllegalArgumentException e) {
 			SessionErrors.add(request, "proxy-download-problem");
-			log.info("***** errore myproxy IllegalArgumentException *****");
+			log.error("***** errore myproxy IllegalArgumentException *****");
 			response.setRenderParameter("myaction", "idps");
 
 		} catch (FileNotFoundException e) {
-			log.info("Could not write credential to file "
+			log.error("Could not write credential to file "
 					+ proxyFile.getAbsolutePath() + ": " + e.getMessage());
 			throw new IOException(e.getMessage());
 
@@ -217,7 +245,7 @@ public class GetProxyController {
 				try {
 					out.close();
 				} catch (IOException e) {
-					log.info("Could not write credential to file "
+					log.error("Could not write credential to file "
 							+ proxyFile.getAbsolutePath() + ": "
 							+ e.getMessage());
 					throw e;
@@ -226,7 +254,57 @@ public class GetProxyController {
 		}
 	}
 	
-	private boolean myVomsProxyInit(String proxyFile, String voms, String role, ActionRequest request){
+	private boolean myMyProxyInit(String proxyFile, String host, String dn, String pass, ActionRequest request){
+		
+		String[] commands = new String[]{"/opt/globus/bin/myproxy-init", "-n", "-l", dn, "-s", host, "-C", proxyFile, "-y", proxyFile};
+
+		for (int i = 0; i < commands.length; i++) {
+			log.info("cmd = "+ commands[i]);
+		}
+		
+		Process p;
+		try {
+			p = Runtime.getRuntime().exec(commands);
+		
+			InputStream stdout = p.getInputStream();
+			InputStream stderr = p.getErrorStream();
+			
+			BufferedReader output = new BufferedReader(new InputStreamReader(
+					stdout));
+			String line = null;
+
+			while ((line = output.readLine()) != null) {
+				log.info("[Stdout] " + line);
+			}
+			output.close();
+			
+			boolean error = false;
+
+			BufferedReader brCleanUp = new BufferedReader(
+					new InputStreamReader(stderr));
+			while ((line = brCleanUp.readLine()) != null) {
+				
+				if(!line.contains("....")){
+					log.error("[Stderr] " + line);
+					error= true;
+				}
+			}
+			if(error)
+				SessionErrors.add(request, "myMyProxyInit-problem");
+			brCleanUp.close();
+			
+			return true;
+		
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			SessionErrors.add(request, "myMyProxyInit-exception");
+			e.printStackTrace();
+			return false;
+		}
+		
+	}
+	
+	private boolean myVomsProxyInit(String proxyFile, String voms, String role, String valid, ActionRequest request){
 		try {
 			
 			User user = (User) request.getAttribute(WebKeys.USER);
@@ -236,8 +314,8 @@ public class GetProxyController {
 
 			String proxy = dir + "/users/" + user.getUserId() + "/x509up";
 			
-			String cmd = "voms-proxy-init -noregen -cert " + proxy + " -key " + proxy + " -out " + proxyFile + " -valid 96:00 -voms " + voms;
-			//log.error(cmd);
+			String cmd = "voms-proxy-init -noregen -cert " + proxy + " -key " + proxy + " -out " + proxyFile + " -valid " + valid  + " -voms " + voms;
+			log.info(cmd);
 			if(!role.equals("norole")){
 				cmd += ":" + role;
 			}

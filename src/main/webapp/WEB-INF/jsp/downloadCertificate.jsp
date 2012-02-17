@@ -72,7 +72,7 @@
 			<c:if test="${fn:length(userVos) == 1}">
 				<strong>VO <c:forEach var="userVo" items="${userVos}"><c:out value="${userVo.vo }"></c:out></c:forEach> </strong>
 				<br/>
-				Inserisci la tua password.
+				Insert your password.
 				<br/>	
 				<aui:input name="vosId" type="hidden"
 								value="0" />
@@ -81,7 +81,7 @@
 			<c:if test="${fn:length(userVos) > 1}">
 				
 				
-				<strong>Seleziona la VO:</storng><br/>
+				<strong>Select VO:</storng><br/>
 				<select id="<portlet:namespace/>vosId" name="<portlet:namespace/>vosId" onChange="showRoleList();">
 					
 					<c:forEach var="userVo" items="${userVos}">

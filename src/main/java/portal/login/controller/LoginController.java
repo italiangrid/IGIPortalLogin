@@ -290,7 +290,7 @@ public class LoginController {
 									"<td colspan=\"3\" style=\"color: #000080\" align=\"center\"><strong>VO: " + vo.getVo() + "</strong></td>" +
 								  "</tr>" +
 								  "<tr>" +
-								    "<td> <strong>Ruolo:</strong>&nbsp&nbsp</td>" +
+								    "<td> <strong>Role:</strong>&nbsp&nbsp</td>" +
 								    "<td> " + role + "&nbsp&nbsp</td>" +
 								    "<td rowspan=\"2\" align=\"right\">" + button + "</td>" +
 								  "</tr>" +
