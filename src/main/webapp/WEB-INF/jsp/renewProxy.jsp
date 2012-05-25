@@ -10,7 +10,7 @@
 
 
 
-<aui:form name="addUserInfoForm" commandName="userInfo" method="post"
+<aui:form name="addUserInfoForm" commandName="userInfo"
 	action="${getProxyUrl}">
 
 	<aui:layout>

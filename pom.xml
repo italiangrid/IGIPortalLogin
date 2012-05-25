@@ -272,11 +272,12 @@
 			<groupId>cog-jglobus</groupId>
 			<artifactId>cog-jglobus</artifactId>
 			<version>1.8.0</version>
-			<scope>provided</scope>
+			<type>jar</type>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 	<properties>
 		<liferay.auto.deploy.dir>../bundles/liferay-portal-6.0/deploy</liferay.auto.deploy.dir>
-		<liferay.version>6.0.5</liferay.version>
+		<liferay.version>6.1.0</liferay.version>
 	</properties>
 </project>

@@ -1,14 +1,5 @@
 package portal.login.controller;
 
-import java.io.IOException;
-import java.security.cert.CertificateEncodingException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import javax.portlet.ActionRequest;
-import javax.portlet.ActionResponse;
 import javax.portlet.RenderRequest;
 
 import org.apache.log4j.Logger;
@@ -17,7 +8,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.portlet.bind.annotation.ActionMapping;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
 
 import com.liferay.portal.kernel.util.WebKeys;
@@ -26,7 +16,6 @@ import com.liferay.portal.model.User;
 import portal.login.domain.UserInfo;
 import portal.login.domain.UserToVo;
 import portal.login.domain.Vo;
-import portal.login.services.CertificateService;
 import portal.login.services.UserInfoService;
 import portal.login.services.UserToVoService;
 import portal.login.services.VoService;
@@ -59,12 +48,6 @@ public class RenewProxy {
 	 */
 	@Autowired
 	private VoService voService;
-	
-	/**
-	 * Attribute for access to the PortalUser database.
-	 */
-	@Autowired
-	private CertificateService certificateService;
 
 	/**
 	 * Method for render downloadCertificate.jsp page.
@@ -96,6 +79,7 @@ public class RenewProxy {
 		String username = ((User)request.getAttribute(WebKeys.USER)).getScreenName();
 		UserInfo userInfo = userInfoService.findByUsername(username);
 		
+		log.info("Get User FQANs");
 		
 		UserToVo utv = userToVoService.findById(userInfo.getUserId(), idVo);
 		

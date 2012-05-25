@@ -23,7 +23,7 @@
             $('#<portlet:namespace/>div_fqans_'+$(this).val()).hide("slow");
    		});
 		var showThis = $('#<portlet:namespace/>vosId').val();
-		//alert(showThis);
+		alert(showThis);
 		$('#<portlet:namespace/>div_fqans_'+showThis).show("slow");
 	}
 	
@@ -60,7 +60,7 @@
 <jsp:useBean id="userVos" type="java.util.List<portal.login.domain.Vo>" scope="request"></jsp:useBean>
 <jsp:useBean id="userFqans" type="java.util.Map" scope="request" />
 
-<aui:form name="addUserInfoForm" commandName="userInfo" method="post"
+<aui:form name="addUserInfoForm" commandName="userInfo"
 	action="${getProxyUrl}">
 
 	<aui:layout>
@@ -70,12 +70,11 @@
 			<aui:column>
 			
 			<c:if test="${fn:length(userVos) == 1}">
-				<strong>VO <c:forEach var="userVo" items="${userVos}"><c:out value="${userVo.vo }"></c:out></c:forEach> </strong>
+				<strong>VO <c:forEach var="userVo" items="${userVos}"><c:out value="${userVo.vo }"></c:out><aui:input name="vosId" type="hidden" value="${userVo.idVo}" /></c:forEach> </strong>
 				<br/>
 				Insert your password.
 				<br/>	
-				<aui:input name="vosId" type="hidden"
-								value="0" />
+				
 			</c:if>
 			
 			<c:if test="${fn:length(userVos) > 1}">

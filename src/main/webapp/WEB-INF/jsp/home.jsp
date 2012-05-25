@@ -52,7 +52,7 @@
 	<portlet:param name="myaction" value="getProxy" />
 </portlet:actionURL>				 		 
 
-<liferay-portlet:renderURL plid="11448" portletName="Registration_WAR_Registration4_INSTANCE_5qFf" var="vaiqui"/>
+<liferay-portlet:renderURL plid="11979" portletName="Registration_WAR_Registration4_INSTANCE_W1Nq" var="vaiqui"/>
 
 <liferay-ui:success key="proxy-download-success"
 	message="proxy-download-success" />
@@ -121,7 +121,7 @@
 			    
 			    <br/>
 				
-				<aui:form name="addUserInfoForm" commandName="userInfo" method="post" action="${getProxyUrl}">
+				<aui:form name="addUserInfoForm" commandName="userInfo" action="${getProxyUrl}">
 	
 					<aui:input name="vosId" type="hidden"
 								value="0" />
@@ -161,7 +161,7 @@
 				
 				<br/> No VO selected. Choose a VO to use clicking the button below. <br/>
 				 
-				<aui:form name="catalogForm" method="post"
+				<aui:form name="catalogForm"
 						action="${downloadCertificateUrl}">
 						
 							<aui:button-row>
@@ -193,7 +193,7 @@
 	    </table>
 		<br/>
 		<c:if test="${(count) < voNumber}">
-			<aui:form name="catalogForm" method="post"
+			<aui:form name="catalogForm"
 					action="${downloadCertificateUrl}">
 					
 				<aui:button-row>

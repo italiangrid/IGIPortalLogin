@@ -13,11 +13,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
 
-import portal.login.domain.Certificate;
 import portal.login.domain.UserInfo;
 import portal.login.domain.UserToVo;
 import portal.login.domain.Vo;
-import portal.login.services.CertificateService;
 import portal.login.services.UserInfoService;
 import portal.login.services.UserToVoService;
 
@@ -54,12 +52,6 @@ public class DownloadCertificateController {
 	 */
 	@Autowired
 	private UserToVoService userToVoService;
-	
-	/**
-	 * Attribute for access to the PortalUser database.
-	 */
-	@Autowired
-	private CertificateService certificateService;
 
 	/**
 	 * Method for render downloadCertificate.jsp page.

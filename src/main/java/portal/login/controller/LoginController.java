@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import javax.portlet.PortletURL;
@@ -116,7 +117,7 @@ public class LoginController {
 								.getScreenName());
 
 						File credFile = new File(dir + "/users/"
-								+ user.getUserId() + "/.cred");
+								+ user.getUserId() + "/.creds");
 						File proxyVoFile = null;
 						credFile.delete();
 						proxyFile.delete();
@@ -129,10 +130,12 @@ public class LoginController {
 							proxyVoFile = new File(dir + "/users/"
 									+ user.getUserId() + "/x509up."
 									+ vo.getVo());
-							cred = new GlobusCredential(
-									proxyVoFile.toString());
-							if(cred.getTimeLeft() <= 0)
-								proxyVoFile.delete();
+							if(proxyVoFile.exists()){
+								cred = new GlobusCredential(
+										proxyVoFile.toString());
+								if(cred.getTimeLeft() <= 0)
+									proxyVoFile.delete();
+							}
 						}
 
 						SessionMessages.add(request, "proxy-expired-deleted");
@@ -238,17 +241,34 @@ public class LoginController {
 							BufferedReader output = new BufferedReader(new InputStreamReader(
 									stdout));
 							String line = null;
-
+							
+							boolean check = true;
+							List<String> tmpRole = new ArrayList<String>();
+							
+							
 							while ((line = output.readLine()) != null) {
 								log.info("[Stdout] " + line);
 								if(roles!=null){
+									if(line.contains("/gridit/Role=NULL")){
+										tmpRole.add(role);
+										log.info("trovato: "+ role);
+									}
 									for(int i=0; i<roles.length; i++){
-										if(line.contains(roles[i])){
-											role=roles[i];
+										//log.info("check con: "+roles[i]);
+										if(line.contains(roles[i].trim())){
+											tmpRole.add(roles[i].trim());
+											log.info("trovato: "+ roles[i]);
 										}
 									}
+									
+									/*if(line.contains("attribute : ")){
+										check = true;
+									}*/
 								}
 							}
+							if(!tmpRole.isEmpty())
+								role=tmpRole.get(0);
+							log.info("Fine trovato: "+ role);
 							output.close();
 							
 							//boolean error = false;

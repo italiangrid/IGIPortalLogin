@@ -213,11 +213,11 @@ public class GetProxyController {
 
 
 			FileWriter fstream = new FileWriter(dir + "/users/"
-					+ user.getUserId() + "/.cred", true);
+					+ user.getUserId() + "/.creds", true);
 			BufferedWriter outcred = new BufferedWriter(fstream);
 			outcred.write(System.currentTimeMillis()
 					+ ";"+host+";" + globusCred.getTimeLeft()
-					+ "; ;#" + selectedVo.getVo() + "\n");
+					+ "; ;#" + selectedVo.getVo() + " ;\n");
 			// Close the output stream
 			outcred.close();
 
@@ -256,7 +256,7 @@ public class GetProxyController {
 	
 	private boolean myMyProxyInit(String proxyFile, String host, String dn, String pass, ActionRequest request){
 		
-		String[] commands = new String[]{"/opt/globus/bin/myproxy-init", "-n", "-l", dn, "-s", host, "-C", proxyFile, "-y", proxyFile};
+		String[] commands = new String[]{"/usr/bin/myproxy-init", "-n", "-d", "-s", host, "-C", proxyFile, "-y", proxyFile};
 
 		for (int i = 0; i < commands.length; i++) {
 			log.info("cmd = "+ commands[i]);
@@ -371,7 +371,7 @@ public class GetProxyController {
 
 		UserInfo userInfo = userInfoService
 				.findByUsername(user.getScreenName());
-		File credFile = new File(dir + "/users/" + user.getUserId() + "/.cred");
+		File credFile = new File(dir + "/users/" + user.getUserId() + "/creds");
 		File proxyVoFile = null;
 		File proxyFile = new File(dir + "/users/" + user.getUserId()
 				+ "/x509up");
