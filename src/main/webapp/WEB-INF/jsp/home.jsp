@@ -137,7 +137,14 @@
 						                 varStatus="status">
 						      
 						        
-						        <aui:option value="${currentName}"><liferay-ui:message key="${currentName}"/></aui:option>
+						        		<c:choose>
+								        <c:when test="${status.count == '1'}">
+								        	<aui:option value="${currentName}" selected="true"> <liferay-ui:message key="${currentName}"/></aui:option>
+										</c:when>
+										<c:otherwise>
+										<aui:option value="${currentName}" > <liferay-ui:message key="${currentName}"/></aui:option>
+										</c:otherwise>
+										</c:choose>
 						    </c:forTokens>
 							
 						</aui:select>

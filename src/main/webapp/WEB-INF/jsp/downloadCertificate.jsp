@@ -7,6 +7,9 @@
 	function setValue(idVo){
 		
 		var valore = $("#<portlet:namespace/>fqan_"+idVo+" option:selected").val();
+		
+		//alert(valore);
+		
 		var output = "";
 	
 		output = "<input name='<portlet:namespace/>fqan' id='<portlet:namespace/>fqan' type='hidden' value='" + valore+ "' />";
@@ -23,8 +26,13 @@
             $('#<portlet:namespace/>div_fqans_'+$(this).val()).hide("slow");
    		});
 		var showThis = $('#<portlet:namespace/>vosId').val();
-		alert(showThis);
+		//alert(showThis);
 		$('#<portlet:namespace/>div_fqans_'+showThis).show("slow");
+		
+		//alert($('#<portlet:namespace/>fqan_'+showThis).val());
+		
+		setValue(showThis);
+		
 	}
 	
 	function start(){
@@ -34,7 +42,7 @@
 		$('#<portlet:namespace/>vosId').find('option').each(function() {
             //alert($(this).val());
             //$('#<portlet:namespace/>div_fqans_'+$(this).val()).hide("slow");
-            alerct($(this).text());
+            alert($(this).text());
             if($(this).text()==defaultVo){
             	alert("trovato");
             	$(this).attr("selected", "selected");
@@ -101,6 +109,7 @@
 			
 			</c:if>
 			
+				
 			
 				<c:forEach var="userVo" items="${userVos}">
 				
@@ -118,9 +127,15 @@
 						                 delims=";"
 						                 var="currentName"
 						                 varStatus="status">
-						      
-						        
-						        <aui:option value="${currentName}"><liferay-ui:message key="${currentName}"/></aui:option>
+						      	<c:choose>
+						        <c:when test="${status.count == '1'}">
+									
+						        	<aui:option value="${currentName}" selected="true"> <liferay-ui:message key="${currentName}"/></aui:option>
+								</c:when>
+								<c:otherwise>
+								<aui:option value="${currentName}" > <liferay-ui:message key="${currentName}"/></aui:option>
+								</c:otherwise>
+								</c:choose>
 						    </c:forTokens>
 							
 						</aui:select>

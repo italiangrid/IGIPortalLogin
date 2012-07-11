@@ -115,7 +115,8 @@ public class GetProxyController {
 		prop.load(inStream);
 		inStream.close();
 		
-		String host = prop.getProperty("host");
+		String host = prop.getProperty("myproxy.storage");
+		String hostGrid = prop.getProperty("myproxy.grid");
 		String valid = prop.getProperty("valid");
 		
 		log.info("Host = " + host);
@@ -199,7 +200,7 @@ public class GetProxyController {
 			Util.setFilePermissions(myproxyFile.toString(), 600);
 			myproxyCred.save(out);*/
 			
-			myMyProxyInit(proxyFile.toString(), host, cert.getSubject(), pass, request);
+			myMyProxyInit(proxyFile.toString(), hostGrid, cert.getSubject(), pass, request);
 			
 			//myproxyFile.delete();
 			
@@ -259,7 +260,7 @@ public class GetProxyController {
 		String[] commands = new String[]{"/usr/bin/myproxy-init", "-n", "-d", "-s", host, "-C", proxyFile, "-y", proxyFile};
 
 		for (int i = 0; i < commands.length; i++) {
-			log.info("cmd = "+ commands[i]);
+			log.error("cmd = "+ commands[i]);
 		}
 		
 		Process p;
@@ -274,7 +275,7 @@ public class GetProxyController {
 			String line = null;
 
 			while ((line = output.readLine()) != null) {
-				log.info("[Stdout] " + line);
+				log.error("[Stdout] " + line);
 			}
 			output.close();
 			
