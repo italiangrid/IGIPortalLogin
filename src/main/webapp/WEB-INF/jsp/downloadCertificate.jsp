@@ -57,7 +57,7 @@
 
 </script>
 
-<div id="container"> 
+<div id="containerLogin"> 
 
 <portlet:actionURL var="getProxyUrl">
 	<portlet:param name="myaction" value="getProxy" />
@@ -70,24 +70,29 @@
 <jsp:useBean id="userVos" type="java.util.List<it.italiangrid.portal.dbapi.domain.Vo>" scope="request"></jsp:useBean>
 <jsp:useBean id="userFqans" type="java.util.Map" scope="request" />
 
-<aui:form name="addUserInfoForm" commandName="userInfo"
-	action="${getProxyUrl}">
-
-	<aui:layout>
-	
-		<aui:fieldset>
+<aui:fieldset>
+		<div id="presentationLogin">
 			<aui:column columnWidth="70">
+				<div style="height: 28px; display:table-cell; vertical-align:bottom;">
 				Hi <strong><c:out
 						value="<%=((User) request.getAttribute(WebKeys.USER)).getFirstName() %>"></c:out>
 				</strong>
+				</div>
 			</aui:column>
 			<aui:column columnWidth="30">
 				<div id="linkImg">
-					<liferay-portlet:renderURL plid="11979" portletName="Registration_WAR_Registration4_INSTANCE_W1Nq" var="vaiqui"/>
 					<aui:a href="${vaiqui}" onmouseover="viewTooltip('#settings');"><img src="<%=request.getContextPath()%>/images/advancedsettings.png" alt="User settings" width="24" height="24" style="float: right; padding-right:10px;" /></aui:a>
 				</div>
 			</aui:column>
-		</aui:fieldset>
+		</div>
+	</aui:fieldset>
+<br/><br/><br/>
+<aui:form name="addUserInfoForm" commandName="userInfo"
+	action="${getProxyUrl}">
+
+	
+	
+		
 
 		<aui:fieldset>
 
@@ -176,7 +181,7 @@
 			</aui:button-row>
 
 		</aui:fieldset>
-	</aui:layout>
+	
 </aui:form>
 
 

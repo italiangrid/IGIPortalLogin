@@ -339,16 +339,16 @@ public class LoginController {
 						
 						
 						result += "<tr>" +
-									"<td colspan=\"3\" style=\"color: #000080\"><strong>VO: " + vo.getVo() + "</strong></td>" +
+									"<td colspan=\"3\" style=\"color: #000080\"><strong><u>VO: " + vo.getVo() + "</u></strong></td>" +
 								  "</tr>" +
 								  "<tr>" +
-								    "<td style='width: 20%;'> <strong>Role:</strong>&nbsp&nbsp</td>" +
-								    "<td style='width: 60%;'> " + role + "&nbsp&nbsp</td>" +
-								    "<td style='width: 20%;'rowspan=\"2\" align=\"right\">" + button + "</td>"  +
+								    "<td style='width: 60px;'> <strong>Role:</strong>&nbsp&nbsp</td>" +
+								    "<td> " + role + "&nbsp&nbsp</td>" +
+								    "<td style='width: 70px;'rowspan=\"2\" align=\"right\">" + button + "</td>"  +
 								  "</tr>" +
 								  "<tr>" +
-								    "<td style='width: 20%;'> <strong>TimeLeft:</strong>&nbsp&nbsp</td>" +
-								    "<td style='width: 60%;'>" + timeLeft + "</td>" +
+								    "<td style='width: 60px;'> <strong>TimeLeft:</strong>&nbsp&nbsp</td>" +
+								    "<td>" + timeLeft + "</td>" +
 								  "</tr> *";
 					}
 				}
