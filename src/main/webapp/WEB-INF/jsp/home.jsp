@@ -35,6 +35,8 @@
 	    });
 	     
 	});
+	
+	
 
 	function goLogin() {
 		var addrIdp = $("#<portlet:namespace/>idpId").val();
@@ -42,7 +44,37 @@
 			window.location = addrIdp;
 		}
 	}
+	
+	function viewTooltip(url){
+		
+		$("#linkImg a").tooltip({
+			
+			bodyHandler: function() {
+				return $(url).html();
+			},
+			showURL: false
+			
+		});
+	}
+	
+	$(function() {
+
+
+		$("#tooltipImg a").tooltip({
+			bodyHandler: function() {
+				
+				return $($(this).attr("href")).html();
+			},
+			showURL: false
+			
+		});
+
+	});
+
+	
 </script>
+
+<div id="container">
 
 <portlet:renderURL var="downloadCertificateUrl">
 	<portlet:param name="myaction" value="downloadCertificate" />
@@ -93,7 +125,9 @@
 			</strong>
 		</aui:column>
 		<aui:column columnWidth="30">
-			<aui:a href="${vaiqui}">User Settings</aui:a>
+			<div id="linkImg">
+				<aui:a href="${vaiqui}" onmouseover="viewTooltip('#settings');"><img src="<%=request.getContextPath()%>/images/advancedsettings.png" alt="User settings" width="24" height="24" style="float: right; padding-right:10px;" /></aui:a>
+			</div>
 		</aui:column>
 	</aui:fieldset>
 	
@@ -104,22 +138,21 @@
 		<c:choose>
 		
 			<c:when test="${voNumber == 0 }">
+			
+				<div class="portlet-msg-error"> Your registration isn't COMPLETE.</div>
 				
-				<span style="color:red"><strong>Your registration isn't COMPLETE</strong></span>
-				
-				
-				<br/><br/>
+				<br/>
 				Terminate your registration <aui:a href="${vaiqui}">HERE</aui:a>.
 				
 				<br/><br/>
 			</c:when>
 			<c:when test="${voNumber == 1 }">
 				
-				<u>VO in usage:</u>
+				<br/> 
 				
-				<br/> No VO selected. Choose a VO to use clicking the button below. <br/> 
-			    
-			    <br/>
+				<div class="portlet-msg-error"> No VO selected. Insert your proxy password and get proxy.</div>
+				
+				<br/>
 				
 				<aui:form name="addUserInfoForm" commandName="userInfo" action="${getProxyUrl}">
 	
@@ -164,9 +197,12 @@
 				</aui:form>
 			</c:when>
 			<c:otherwise>
-				<u>VO in usage:</u><br/>
 				
-				<br/> No VO selected. Choose a VO to use clicking the button below. <br/>
+				<br/> 
+				
+				<div class="portlet-msg-error"> No VO selected. Choose a VO to use clicking the button below.</div>
+				
+				<br/>
 				 
 				<aui:form name="catalogForm"
 						action="${downloadCertificateUrl}">
@@ -181,7 +217,6 @@
 	</c:if>
 
 	<c:if test="${proxyDownloaded}">
-		<u>VO in usage:</u><br/>
 		
 		<c:set var="count" value="0" />
 		<table border="0" width="100%">
@@ -211,3 +246,9 @@
 		</c:if>
 	</c:if>
 </c:if>
+<div id="renewButton" style="display:none;">Renew proxy.</div>
+<div id="settings" style="display:none;">User Settings.</div>
+<div id="allOK" style="display:none;">All is OK.</div>
+<div id="warning" style="display:none;">Your proxy will be expire,<br/> renew proxy.</div>
+
+</div>

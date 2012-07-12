@@ -8,16 +8,26 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.portlet.PortletConfig;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderResponse;
 import javax.portlet.RenderRequest;
-import portal.login.domain.Idp;
-import portal.login.domain.UserInfo;
-import portal.login.domain.UserToVo;
-import portal.login.domain.Vo;
-import portal.login.services.IdpService;
-import portal.login.services.UserInfoService;
-import portal.login.services.UserToVoService;
+//import portal.login.domain.Idp;
+//import portal.login.domain.UserInfo;
+//import portal.login.domain.UserToVo;
+//import portal.login.domain.Vo;
+//import portal.login.services.IdpService;
+//import portal.login.services.UserInfoService;
+//import portal.login.services.UserToVoService;
+
+import it.italiangrid.portal.dbapi.domain.Idp;
+import it.italiangrid.portal.dbapi.domain.UserInfo;
+import it.italiangrid.portal.dbapi.domain.UserToVo;
+import it.italiangrid.portal.dbapi.domain.Vo;
+import it.italiangrid.portal.dbapi.services.IdpService;
+import it.italiangrid.portal.dbapi.services.UserInfoService;
+import it.italiangrid.portal.dbapi.services.UserToVoService;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.*;
@@ -28,6 +38,7 @@ import org.springframework.web.portlet.bind.annotation.RenderMapping;
 
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
+import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.User;
 import org.globus.gsi.GlobusCredential;
@@ -102,48 +113,61 @@ public class LoginController {
 		if (user != null) {
 			String dir = System.getProperty("java.io.tmpdir");
 			log.info("Directory = " + dir);
+			
+			UserInfo userInfo = userInfoService.findByUsername(user.getScreenName());
+			List<Vo> vos = userToVoService.findVoByUserId(userInfo
+					.getUserId());
+			File proxyVoFile = null;
+			for (Iterator<Vo> iterator = vos.iterator(); iterator
+					.hasNext();) {
+				Vo vo = (Vo) iterator.next();
+				proxyVoFile = new File(dir + "/users/"
+						+ user.getUserId() + "/x509up."
+						+ vo.getVo());
 
-			File proxyFile = new File(dir + "/users/" + user.getUserId()
-					+ "/x509up");
-
-			if (proxyFile.exists()) {
-				try {
-					GlobusCredential cred = new GlobusCredential(
-							proxyFile.toString());
-					if (cred.getTimeLeft() > 0) {
-						return true;
-					} else {
-						UserInfo userInfo = userInfoService.findByUsername(user
-								.getScreenName());
-
-						File credFile = new File(dir + "/users/"
-								+ user.getUserId() + "/.creds");
-						File proxyVoFile = null;
-						credFile.delete();
-						proxyFile.delete();
-
-						List<Vo> vos = userToVoService.findVoByUserId(userInfo
-								.getUserId());
-						for (Iterator<Vo> iterator = vos.iterator(); iterator
-								.hasNext();) {
-							Vo vo = (Vo) iterator.next();
-							proxyVoFile = new File(dir + "/users/"
-									+ user.getUserId() + "/x509up."
-									+ vo.getVo());
-							if(proxyVoFile.exists()){
-								cred = new GlobusCredential(
-										proxyVoFile.toString());
-								if(cred.getTimeLeft() <= 0)
-									proxyVoFile.delete();
-							}
+//				File proxyFile = new File(dir + "/users/" + user.getUserId()
+//						+ "/x509up");
+	
+				if (proxyVoFile.exists()) {
+					try {
+						GlobusCredential cred = new GlobusCredential(
+								proxyVoFile.toString());
+						if (cred.getTimeLeft() > 0) {
+							return true;
+						} else {
+							
+	//						UserInfo userInfo = userInfoService.findByUsername(user
+	//								.getScreenName());
+	//
+	//						File credFile = new File(dir + "/users/"
+	//								+ user.getUserId() + "/.creds");
+	//						File proxyVoFile = null;
+	//						credFile.delete();
+	//						proxyFile.delete();
+	//
+	//						List<Vo> vos = userToVoService.findVoByUserId(userInfo
+	//								.getUserId());
+	//						for (Iterator<Vo> iterator = vos.iterator(); iterator
+	//								.hasNext();) {
+	//							Vo vo = (Vo) iterator.next();
+	//							proxyVoFile = new File(dir + "/users/"
+	//									+ user.getUserId() + "/x509up."
+	//									+ vo.getVo());
+	//							if(proxyVoFile.exists()){
+	//								cred = new GlobusCredential(
+	//										proxyVoFile.toString());
+	//								if(cred.getTimeLeft() <= 0)
+										proxyVoFile.delete();
+	//							}
+	//						}
+	
+							SessionMessages.add(request, "proxy-expired-deleted");
 						}
-
-						SessionMessages.add(request, "proxy-expired-deleted");
+					} catch (GlobusCredentialException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						log.info("e mò sono cazzi amari");
 					}
-				} catch (GlobusCredentialException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					log.info("e mò sono cazzi amari");
 				}
 			}
 
@@ -193,6 +217,10 @@ public class LoginController {
 	 */
 	@ModelAttribute("proxys")
 	public String getProxys(RenderRequest request, RenderResponse response) throws GlobusCredentialException {
+		
+		PortletConfig portletConfig = (PortletConfig)request.getAttribute(JavaConstants.JAVAX_PORTLET_CONFIG);
+		SessionMessages.add(request, portletConfig.getPortletName() + SessionMessages.KEY_SUFFIX_HIDE_DEFAULT_ERROR_MESSAGE);
+		
 		String result = "";
 		User user = (User)request.getAttribute(WebKeys.USER);
 		if(user!=null){
@@ -286,6 +314,7 @@ public class LoginController {
 							
 
 						} catch (IOException e) {
+							
 							SessionErrors.add(request, "voms-proxy-init-exception");
 							e.printStackTrace();
 						}
@@ -294,29 +323,32 @@ public class LoginController {
 						long hours = totalSecs / 3600;
 						long minutes = (totalSecs % 3600) / 60;
 						long seconds = totalSecs % 60;
-						
-						String timeLeft = hours + ":" + minutes +  ":" + seconds;
-						if(hours < 1)
-							timeLeft = "<span style=\"color:red\"><strong>" + timeLeft + "</strong></span>";
-						else
-							timeLeft = "<span style=\"color:#63AC68\"><strong>" + timeLeft + "</strong></span>";
-						
 						PortletURL url = response.createRenderURL();
 						url.setParameter("myaction", "showRenewProxy");
 						url.setParameter("idVo", Integer.toString(vo.getIdVo()));
-						String button = "<input type=\"submit\" value=\"Renew\" onClick=\"location.href=\'"+url+"\';\"></input>";
+//						String button = "<input type=\"submit\" value=\"Renew\" onClick=\"location.href=\'"+url+"\';\"></input>";
+						String button = "<div id=\"linkImg\"><a href=\""+url+"\" onmouseover=\"viewTooltip('#renewButton');\"><img src=\"" + request.getContextPath() + "/images/update.png\" width=\"24\" height=\"24\" style=\"float: right; padding-right:10px;\"/></a></div>";
+						String timeLeft = hours + ":" + minutes +  ":" + seconds;
+						if(hours < 1){
+							timeLeft = "<span style=\"color:red\"><strong>" + timeLeft + "</strong></span>";
+							button += "<div id=\"tooltipImg\"><a href=\"#warning\"><img src=\"" + request.getContextPath() + "/images/alert.png\" width=\"24\" height=\"24\" style=\"float: right; padding-right:10px;\"/></a></div>";
+						}else{
+							timeLeft = "<span style=\"color:#63AC68\"><strong>" + timeLeft + "</strong></span>";
+							button += "<div id=\"tooltipImg\"><a href=\"#allOK\"><img src=\"" + request.getContextPath() + "/images/check.png\" width=\"24\" height=\"24\" style=\"float: right; padding-right:10px;\"/></a></div>";
+						}
+						
 						
 						result += "<tr>" +
-									"<td colspan=\"3\" style=\"color: #000080\" align=\"center\"><strong>VO: " + vo.getVo() + "</strong></td>" +
+									"<td colspan=\"3\" style=\"color: #000080\"><strong>VO: " + vo.getVo() + "</strong></td>" +
 								  "</tr>" +
 								  "<tr>" +
-								    "<td> <strong>Role:</strong>&nbsp&nbsp</td>" +
-								    "<td> " + role + "&nbsp&nbsp</td>" +
-								    "<td rowspan=\"2\" align=\"right\">" + button + "</td>" +
+								    "<td style='width: 20%;'> <strong>Role:</strong>&nbsp&nbsp</td>" +
+								    "<td style='width: 60%;'> " + role + "&nbsp&nbsp</td>" +
+								    "<td style='width: 20%;'rowspan=\"2\" align=\"right\">" + button + "</td>"  +
 								  "</tr>" +
 								  "<tr>" +
-								    "<td> <strong>TimeLeft:</strong>&nbsp&nbsp</td>" +
-								    "<td>" + timeLeft + "</td>" +
+								    "<td style='width: 20%;'> <strong>TimeLeft:</strong>&nbsp&nbsp</td>" +
+								    "<td style='width: 60%;'>" + timeLeft + "</td>" +
 								  "</tr> *";
 					}
 				}

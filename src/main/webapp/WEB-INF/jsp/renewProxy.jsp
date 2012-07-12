@@ -1,5 +1,7 @@
 <%@ include file="/WEB-INF/jsp/init.jsp"%>
 
+<div id="container">
+
 <portlet:actionURL var="getProxyUrl">
 	<portlet:param name="myaction" value="getProxy" />
 </portlet:actionURL>
@@ -14,6 +16,20 @@
 	action="${getProxyUrl}">
 
 	<aui:layout>
+		
+		<aui:fieldset>
+			<aui:column columnWidth="70">
+				Hi <strong><c:out
+						value="<%=((User) request.getAttribute(WebKeys.USER)).getFirstName() %>"></c:out>
+				</strong>
+			</aui:column>
+			<aui:column columnWidth="30">
+				<div id="linkImg">
+					<liferay-portlet:renderURL plid="11979" portletName="Registration_WAR_Registration4_INSTANCE_W1Nq" var="vaiqui"/>
+					<aui:a href="${vaiqui}" onmouseover="viewTooltip('#settings');"><img src="<%=request.getContextPath()%>/images/advancedsettings.png" alt="User settings" width="24" height="24" style="float: right; padding-right:10px;" /></aui:a>
+				</div>
+			</aui:column>
+		</aui:fieldset>
 
 		<aui:fieldset>
 
@@ -75,3 +91,4 @@
 </aui:form>
 
 
+</div>

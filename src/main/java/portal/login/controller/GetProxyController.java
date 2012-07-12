@@ -18,6 +18,7 @@ import java.util.Properties;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
+import javax.portlet.PortletConfig;
 
 import org.apache.log4j.Logger;
 import org.globus.gsi.GlobusCredential;
@@ -31,16 +32,25 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.bind.annotation.ActionMapping;
 
-import portal.login.domain.Certificate;
+/*import portal.login.domain.Certificate;
 import portal.login.domain.UserInfo;
 import portal.login.domain.Vo;
 import portal.login.services.CertificateService;
 import portal.login.services.UserInfoService;
 import portal.login.services.UserToVoService;
-import portal.login.services.VoService;
+import portal.login.services.VoService;*/
+
+import it.italiangrid.portal.dbapi.domain.Certificate;
+import it.italiangrid.portal.dbapi.domain.UserInfo;
+import it.italiangrid.portal.dbapi.domain.Vo;
+import it.italiangrid.portal.dbapi.services.CertificateService;
+import it.italiangrid.portal.dbapi.services.UserInfoService;
+import it.italiangrid.portal.dbapi.services.UserToVoService;
+import it.italiangrid.portal.dbapi.services.VoService;
 
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
+import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.User;
 
@@ -102,7 +112,8 @@ public class GetProxyController {
 			throws IOException, CertificateEncodingException {
 		log.info("***** Pronto per scaricare il proxy *****");
 		
-		
+		PortletConfig portletConfig = (PortletConfig)request.getAttribute(JavaConstants.JAVAX_PORTLET_CONFIG);
+		SessionMessages.add(request, portletConfig.getPortletName() + SessionMessages.KEY_SUFFIX_HIDE_DEFAULT_ERROR_MESSAGE);
 		
 		String contextPath = GetProxyController.class.getClassLoader().getResource("").getPath();
 		
@@ -226,17 +237,20 @@ public class GetProxyController {
 
 		} catch (MyProxyException e) {
 			//e.printStackTrace();
+			
 			SessionErrors.add(request, "proxy-download-problem");
 			log.error("***** errore myproxy " + e.getMessage()
 					+ " MyProxyException *****");
 			response.setRenderParameter("myaction", "idps");
 
 		} catch (IllegalArgumentException e) {
+			
 			SessionErrors.add(request, "proxy-download-problem");
 			log.error("***** errore myproxy IllegalArgumentException *****");
 			response.setRenderParameter("myaction", "idps");
 
 		} catch (FileNotFoundException e) {
+			
 			log.error("Could not write credential to file "
 					+ proxyFile.getAbsolutePath() + ": " + e.getMessage());
 			throw new IOException(e.getMessage());
@@ -246,6 +260,7 @@ public class GetProxyController {
 				try {
 					out.close();
 				} catch (IOException e) {
+					
 					log.error("Could not write credential to file "
 							+ proxyFile.getAbsolutePath() + ": "
 							+ e.getMessage());
@@ -298,6 +313,7 @@ public class GetProxyController {
 		
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
+			
 			SessionErrors.add(request, "myMyProxyInit-exception");
 			e.printStackTrace();
 			return false;
@@ -351,6 +367,7 @@ public class GetProxyController {
 			return true;
 
 		} catch (IOException e) {
+			
 			SessionErrors.add(request, "voms-proxy-init-exception");
 			e.printStackTrace();
 			return false;

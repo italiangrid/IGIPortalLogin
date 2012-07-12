@@ -9,7 +9,7 @@
 <%@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
 
-<%@ page import="portal.login.domain.Idp" %>
+<%@ page import="it.italiangrid.portal.dbapi.domain.Idp" %>
 
 
 

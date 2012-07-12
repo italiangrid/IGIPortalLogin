@@ -13,12 +13,19 @@ import org.springframework.web.portlet.bind.annotation.RenderMapping;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.User;
 
-import portal.login.domain.UserInfo;
-import portal.login.domain.UserToVo;
-import portal.login.domain.Vo;
-import portal.login.services.UserInfoService;
-import portal.login.services.UserToVoService;
-import portal.login.services.VoService;
+//import portal.login.domain.UserInfo;
+//import portal.login.domain.UserToVo;
+//import portal.login.domain.Vo;
+//import portal.login.services.UserInfoService;
+//import portal.login.services.UserToVoService;
+//import portal.login.services.VoService;
+
+import it.italiangrid.portal.dbapi.domain.UserInfo;
+import it.italiangrid.portal.dbapi.domain.UserToVo;
+import it.italiangrid.portal.dbapi.domain.Vo;
+import it.italiangrid.portal.dbapi.services.UserInfoService;
+import it.italiangrid.portal.dbapi.services.UserToVoService;
+import it.italiangrid.portal.dbapi.services.VoService;
 
 @Controller(value = "renewProxyController")
 @RequestMapping(value = "VIEW")

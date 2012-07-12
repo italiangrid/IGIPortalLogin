@@ -274,6 +274,11 @@
 			<version>1.8.0</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+	    	<groupId>it.italiangrid.portal</groupId>
+	    	<artifactId>db-api</artifactId>
+	    	<version>0.0.1</version>
+	    </dependency>
 	</dependencies>
 	<properties>
 		<liferay.auto.deploy.dir>../bundles/liferay-portal-6.0/deploy</liferay.auto.deploy.dir>
