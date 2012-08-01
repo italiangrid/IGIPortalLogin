@@ -279,6 +279,11 @@
 	    	<artifactId>db-api</artifactId>
 	    	<version>0.0.1</version>
 	    </dependency>
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4.5</version>
+		</dependency>
 	</dependencies>
 	<properties>
 		<liferay.auto.deploy.dir>../bundles/liferay-portal-6.0/deploy</liferay.auto.deploy.dir>

@@ -32,6 +32,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.bind.annotation.ActionMapping;
 
+import portal.login.util.LoadProperties;
+
 /*import portal.login.domain.Certificate;
 import portal.login.domain.UserInfo;
 import portal.login.domain.Vo;
@@ -41,9 +43,11 @@ import portal.login.services.UserToVoService;
 import portal.login.services.VoService;*/
 
 import it.italiangrid.portal.dbapi.domain.Certificate;
+import it.italiangrid.portal.dbapi.domain.Notify;
 import it.italiangrid.portal.dbapi.domain.UserInfo;
 import it.italiangrid.portal.dbapi.domain.Vo;
 import it.italiangrid.portal.dbapi.services.CertificateService;
+import it.italiangrid.portal.dbapi.services.NotifyService;
 import it.italiangrid.portal.dbapi.services.UserInfoService;
 import it.italiangrid.portal.dbapi.services.UserToVoService;
 import it.italiangrid.portal.dbapi.services.VoService;
@@ -78,6 +82,12 @@ public class GetProxyController {
 	 */
 	@Autowired
 	private UserInfoService userInfoService;
+	
+	/**
+	 * Attribute for access to the PortalUser database.
+	 */
+	@Autowired
+	private NotifyService notifyService;
 
 	/**
 	 * Attribute for access to the PortalUser database.
@@ -211,7 +221,7 @@ public class GetProxyController {
 			Util.setFilePermissions(myproxyFile.toString(), 600);
 			myproxyCred.save(out);*/
 			
-			myMyProxyInit(proxyFile.toString(), hostGrid, cert.getSubject(), pass, request);
+			boolean proxyinit = myMyProxyInit(proxyFile.toString(), hostGrid, cert.getSubject(), pass, request);
 			
 			//myproxyFile.delete();
 			
@@ -221,7 +231,7 @@ public class GetProxyController {
 			Util.setFilePermissions(proxyFileVO.toString(), 600);
 			globusCred.save(out);
 			
-			myVomsProxyInit(proxyFileVO.toString(), selectedVo.getVo(), role, valid, request);
+			boolean vomsproxyinit = myVomsProxyInit(proxyFileVO.toString(), selectedVo.getVo(), role, valid, request);
 
 
 			FileWriter fstream = new FileWriter(dir + "/users/"
@@ -232,8 +242,27 @@ public class GetProxyController {
 					+ "; ;#" + selectedVo.getVo() + " ;\n");
 			// Close the output stream
 			outcred.close();
-
-			SessionMessages.add(request, "proxy-download-success");
+			
+			if(proxyinit&&vomsproxyinit){
+				SessionMessages.add(request, "proxy-download-success");
+				
+				log.error("@@@@ TEST @@@@");
+				Notify n = notifyService.findByUserInfo(userInfo);
+				log.error("@@@@" + n.getProxyExpire());
+				log.error("@@@@ TEST @@@@");
+				
+				LoadProperties props = new LoadProperties("checkProxy.properties");
+				if(n.getProxyExpire().equals("true")){
+					log.error("è richiesta la notifica");
+					
+					props.putValue(n.getIdNotify()+"."+selectedVo.getVo(), proxyFileVO.toString()+";"+60+";"+userInfo.getMail()+";"+userInfo.getFirstName());
+				}else{
+					log.error("non è richiesta la notifica");
+					props.deleteValue(n.getIdNotify()+"."+selectedVo.getVo());
+				}
+			} else {
+				SessionErrors.add(request, "proxy-download-problem");
+			}
 
 		} catch (MyProxyException e) {
 			//e.printStackTrace();
