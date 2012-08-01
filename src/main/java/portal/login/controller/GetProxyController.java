@@ -188,8 +188,6 @@ public class GetProxyController {
 
 		File proxyFile = new File(dir + "/users/" + user.getUserId()
 				+ "/x509up");
-		/*File myproxyFile = new File(dir + "/users/" + user.getUserId()
-				+ "/x509uplong");*/
 		File proxyFileVO = new File(dir + "/users/" + user.getUserId()
 				+ "/x509up." + selectedVo.getVo());
 		
