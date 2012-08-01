@@ -197,8 +197,7 @@ public class GetProxyController {
 			log.info("certificato: " + cert.getUsernameCert() + " password: "
 					+ pass);
 			GSSCredential proxy = mp.get(cert.getUsernameCert(), pass, 608400);
-					//100 * 3600);
-			//GSSCredential myproxy = mp.get(cert.getUsernameCert(), pass, 608400);
+			
 			log.info("----- All ok -----");
 			log.info("Proxy:" + proxy.toString());
 
