@@ -156,7 +156,6 @@ public class GetProxyController {
 
 		OutputStream out = null;
 
-		//int cert = Integer.parseInt(request.getParameter("certsId"));
 		int vo = Integer.parseInt(request.getParameter("vosId"));
 		String pass = (String) request.getParameter("proxyPass");
 		String role = (String) request.getParameter("fqan");

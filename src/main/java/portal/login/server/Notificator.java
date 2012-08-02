@@ -19,7 +19,7 @@ public class Notificator implements Runnable{
 	
 	public void run(){
 		try{
-			log.error("############## NOTIFICATOR ##############");
+			log.debug("############## NOTIFICATOR ##############");
 			
 			/*
 			 * Recupera cose da notificate
