@@ -120,14 +120,14 @@ public class GetProxyController {
 	@ActionMapping(params = "myaction=getProxy")
 	public void getProxy(ActionRequest request, ActionResponse response)
 			throws IOException, CertificateEncodingException {
-		log.info("***** Pronto per scaricare il proxy *****");
+		log.error("***** Pronto per scaricare il proxy *****");
 		
 		PortletConfig portletConfig = (PortletConfig)request.getAttribute(JavaConstants.JAVAX_PORTLET_CONFIG);
 		SessionMessages.add(request, portletConfig.getPortletName() + SessionMessages.KEY_SUFFIX_HIDE_DEFAULT_ERROR_MESSAGE);
 		
 		String contextPath = GetProxyController.class.getClassLoader().getResource("").getPath();
 		
-		log.info("dove sono:" + contextPath);
+		log.error("dove sono:" + contextPath);
 		
 		FileInputStream inStream =
 	    new FileInputStream(contextPath + "/content/MyProxy.properties");
@@ -140,14 +140,14 @@ public class GetProxyController {
 		String hostGrid = prop.getProperty("myproxy.grid");
 		String valid = prop.getProperty("valid");
 		
-		log.info("Host = " + host);
-		log.info("Valid = " + valid);
+		log.error("Host = " + host);
+		log.error("Valid = " + valid);
 
 		MyProxy mp = new MyProxy(host, 7512);
 		User user = (User) request.getAttribute(WebKeys.USER);
 
 		String dir = System.getProperty("java.io.tmpdir");
-		log.info("Directory = " + dir);
+		log.error("Directory = " + dir);
 
 		File location = new File(dir + "/users/" + user.getUserId() + "/");
 		if (!location.exists()) {
@@ -159,8 +159,14 @@ public class GetProxyController {
 		int vo = Integer.parseInt(request.getParameter("vosId"));
 		String pass = (String) request.getParameter("proxyPass");
 		String role = (String) request.getParameter("fqan");
-		
-		log.info("role = " + role);
+		log.error(" ");
+		log.error("################################");
+		log.error("#");
+		log.error("# vo = " + vo);
+		log.error("# role = " + role);
+		log.error("#");
+		log.error("################################");
+		log.error(" ");
 
 		String username = user.getScreenName();
 
@@ -190,22 +196,30 @@ public class GetProxyController {
 		File proxyFileVO = new File(dir + "/users/" + user.getUserId()
 				+ "/x509up." + selectedVo.getVo());
 		
+		log.error(" ");
+		log.error("################################");
+		log.error("#");
+		log.error("# selectedVo = " + selectedVo.getVo());
+		log.error("#");
+		log.error("################################");
+		log.error(" ");
+		
 
 		try {
 
-			log.info("certificato: " + cert.getUsernameCert() + " password: "
+			log.error("certificato: " + cert.getUsernameCert() + " password: "
 					+ pass);
 			GSSCredential proxy = mp.get(cert.getUsernameCert(), pass, 608400);
 			
-			log.info("----- All ok -----");
-			log.info("Proxy:" + proxy.toString());
+			log.error("----- All ok -----");
+			log.error("Proxy:" + proxy.toString());
 
 			GlobusCredential globusCred = null;
 			globusCred = ((GlobusGSSCredentialImpl) proxy)
 					.getGlobusCredential();
-			log.info("----- Passo per il istanceof GlobusGSSCredentialImpl");
+			log.error("----- Passo per il istanceof GlobusGSSCredentialImpl");
 
-			log.info("Save proxy file: " + globusCred);
+			log.error("Save proxy file: " + globusCred);
 			out = new FileOutputStream(proxyFile);
 			Util.setFilePermissions(proxyFile.toString(), 600);
 			globusCred.save(out);
@@ -352,16 +366,16 @@ public class GetProxyController {
 			User user = (User) request.getAttribute(WebKeys.USER);
 
 			String dir = System.getProperty("java.io.tmpdir");
-			log.info("Directory = " + dir);
+			log.error("Directory = " + dir);
 
 			String proxy = dir + "/users/" + user.getUserId() + "/x509up";
 			
 			String cmd = "voms-proxy-init -noregen -cert " + proxy + " -key " + proxy + " -out " + proxyFile + " -valid " + valid  + " -voms " + voms;
-			log.info(cmd);
+			log.error(cmd);
 			if(!role.equals("norole")){
 				cmd += ":" + role;
 			}
-			log.info("cmd = " + cmd);
+			log.error("cmd = " + cmd);
 			Process p = Runtime.getRuntime().exec(cmd);
 			InputStream stdout = p.getInputStream();
 			InputStream stderr = p.getErrorStream();
@@ -371,7 +385,7 @@ public class GetProxyController {
 			String line = null;
 
 			while ((line = output.readLine()) != null) {
-				log.info("[Stdout] " + line);
+				log.error("[Stdout] " + line);
 			}
 			output.close();
 			
@@ -410,7 +424,7 @@ public class GetProxyController {
 		User user = (User) request.getAttribute(WebKeys.USER);
 
 		String dir = System.getProperty("java.io.tmpdir");
-		log.info("Directory = " + dir);
+		log.error("Directory = " + dir);
 
 		UserInfo userInfo = userInfoService
 				.findByUsername(user.getScreenName());

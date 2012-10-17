@@ -1,4 +1,6 @@
 package portal.login.controller;
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +26,7 @@ import it.italiangrid.portal.dbapi.domain.UserToVo;
 import it.italiangrid.portal.dbapi.domain.Vo;
 import it.italiangrid.portal.dbapi.services.UserInfoService;
 import it.italiangrid.portal.dbapi.services.UserToVoService;
+import it.italiangrid.portal.dbapi.services.VoService;
 
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.User;
@@ -57,6 +60,12 @@ public class DownloadCertificateController {
 	 * Attribute for access to the PortalUser database.
 	 */
 	@Autowired
+	private VoService voService;
+	
+	/**
+	 * Attribute for access to the PortalUser database.
+	 */
+	@Autowired
 	private UserToVoService userToVoService;
 
 	/**
@@ -78,8 +87,23 @@ public class DownloadCertificateController {
 	@ModelAttribute("userVos")
 	public List<Vo> getUserVos(RenderRequest request) {
 		String username = ((User)request.getAttribute(WebKeys.USER)).getScreenName();
+		long userId = ((User)request.getAttribute(WebKeys.USER)).getUserId();
 		UserInfo userInfo = userInfoService.findByUsername(username);
-		return userToVoService.findVoByUserId(userInfo.getUserId());
+		List<Vo> vos = userToVoService.findVoByUserId(userInfo.getUserId());
+		
+		List<Vo> results = new ArrayList<Vo>();
+		
+		String dir = System.getProperty("java.io.tmpdir");
+		
+		for (Vo vo : vos) {
+			File check = new File(dir + "/users/"+ userId+"/x509up."+vo.getVo());
+			
+			if(!check.exists())
+				results.add(vo);
+		}
+		
+		
+		return results;
 	}
 	
 	/**
@@ -102,7 +126,23 @@ public class DownloadCertificateController {
 	@ModelAttribute("userFqans")
 	public Map<Object,Object> getUserFqans(RenderRequest request) {
 		String username = ((User)request.getAttribute(WebKeys.USER)).getScreenName();
+		long userId = ((User)request.getAttribute(WebKeys.USER)).getUserId();
 		UserInfo userInfo = userInfoService.findByUsername(username);
+		
+		List<Vo> vos = userToVoService.findVoByUserId(userInfo.getUserId());
+		
+		List<Integer> results = new ArrayList<Integer>();
+		
+		String dir = System.getProperty("java.io.tmpdir");
+		
+		for (Vo vo : vos) {
+			File check = new File(dir + "/users/"+ userId+"/x509up."+vo.getVo());
+			
+			if(!check.exists())
+				results.add(vo.getIdVo());
+		}
+		
+		
 		
 		List<UserToVo> utv = userToVoService.findById(userInfo.getUserId());
 		
@@ -113,7 +153,7 @@ public class DownloadCertificateController {
 		for (Iterator<UserToVo> iterator = utv.iterator(); iterator.hasNext();) {
 			UserToVo userToVo = iterator.next();
 			toParse = userToVo.getFqans();
-			if(toParse != null){
+			if(toParse != null && results.contains(userToVo.getId().getIdVo())){
 				x.put(userToVo.getId().getIdVo(), toParse);
 				log.info(userToVo.getId().getIdVo() + " --> " + toParse);
 			}

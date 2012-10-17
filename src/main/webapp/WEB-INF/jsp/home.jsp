@@ -84,7 +84,8 @@
 	<portlet:param name="myaction" value="getProxy" />
 </portlet:actionURL>				 		 
 
-<liferay-portlet:renderURL plid="11979" portletName="Registration_WAR_Registration4_INSTANCE_W1Nq" var="vaiqui"/>
+<!-- <liferay-portlet:renderURL plid="11979" portletName="Registration_WAR_Registration4_INSTANCE_W1Nq" var="vaiqui"/> -->
+<liferay-portlet:renderURL plid="12312" portletName="Registration_WAR_Registration4_INSTANCE_7NTSc9EWudEm" var="vaiqui"/>
 
 
 <c:if test="<%= !themeDisplay.isSignedIn() %>">

@@ -36,11 +36,11 @@ public class Notificator implements Runnable{
 			for (Enumeration<Object> e = props.getProperties().keys() ; e.hasMoreElements() ;) {
 				
 				String key = (String) e.nextElement();
-		        log.error(key);
+		        log.info(key);
 		        
 		        
 		        String value = props.getValue(key);
-		        log.error(value);
+		        log.info(value);
 		        
 		        
 		        String proxyFile = value.split(";")[0];
@@ -50,7 +50,7 @@ public class Notificator implements Runnable{
 		        
 		        String voName =key.split("\\.")[1];
 		        
-		        log.error("RESULT: " + proxyFile + " | " + limit + " | " + voName + " | " + mail + " | " + user);
+		        log.info("RESULT: " + proxyFile + " | " + limit + " | " + voName + " | " + mail + " | " + user);
 		        
 		        File proxy = new File(proxyFile);
 		        
@@ -59,7 +59,7 @@ public class Notificator implements Runnable{
 		        		GlobusCredential cred = new GlobusCredential(
 								proxy.toString());
 		        		
-		        		log.error(cred.getTimeLeft());
+		        		log.info(cred.getTimeLeft());
 		        		
 		        		long totalSecs =cred.getTimeLeft();
 						long hours = totalSecs / 3600;
@@ -68,22 +68,22 @@ public class Notificator implements Runnable{
 						
 						String timeLeft = hours + ":" + minutes +  ":" + seconds;
 						
-						log.error(timeLeft);
+						log.info(timeLeft);
 						
 						if((minutes<(long) limit)&&(hours==0)){
 							
-							log.error("sono dentro");
+							log.info("sono dentro");
 							
 							switch(limit){
 							case 60: props.putValue(key, value.replace("60","30"));
 									
-									 log.error("60  minutes limit");
+									 log.info("60  minutes limit");
 							
 									 sendMail(mail, user, limit, voName);
 									 break;
 							case 30: props.deleteValue(key);
 							
-							 		 log.error("30  minutes limit");
+							 		 log.info("30  minutes limit");
 					
 									 sendMail(mail, user, limit, voName);
 									 break;
@@ -93,7 +93,7 @@ public class Notificator implements Runnable{
 		        	}  catch (GlobusCredentialException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
-						log.info("e mò sono cazzi amari");
+						log.error("*** GlobusCredentialException: " + e1.getMessage() + " ***");
 					}
 		        }
 		     }

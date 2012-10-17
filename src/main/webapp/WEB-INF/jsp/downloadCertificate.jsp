@@ -7,7 +7,7 @@
 	function setValue(idVo){
 		
 		var valore = $("#<portlet:namespace/>fqan_"+idVo+" option:selected").val();
-		
+		//alert(idVo)
 		//alert(valore);
 		
 		var output = "";
@@ -100,9 +100,7 @@
 			
 			<c:if test="${fn:length(userVos) == 1}">
 				<strong>VO <c:forEach var="userVo" items="${userVos}"><c:out value="${userVo.vo }"></c:out><aui:input name="vosId" type="hidden" value="${userVo.idVo}" /></c:forEach> </strong>
-				<br/>
-				Insert your password.
-				<br/>	
+					
 				
 			</c:if>
 			
@@ -140,7 +138,7 @@
 	
 						<aui:select id="fqan_${userVo.idVo }" name="fqan_${userVo.idVo }" label="Roles for ${userVo.vo}" onChange="setValue(${userVo.idVo });">
 											
-							<aui:option value="norole"><liferay-ui:message key="No Role"/></aui:option>
+							<aui:option value="norole" ><liferay-ui:message key="No Role"/></aui:option>
 							
 							
 							
@@ -161,6 +159,21 @@
 							
 						</aui:select>
 						
+						</c:if>
+						
+						<c:if test="${fn:length(userFqans[userVo.idVo]) == 0 }">
+						
+							<div style="display:none;">
+								<aui:select id="fqan_${userVo.idVo }" name="fqan_${userVo.idVo }" label="Roles for ${userVo.vo}" onChange="setValue(${userVo.idVo });">
+												
+									<aui:option value="norole"  selected="true"><liferay-ui:message key="No Role"/></aui:option>
+									
+									
+									
+									
+									
+								</aui:select>
+							</div>
 						</c:if>
 					
 					</div>
