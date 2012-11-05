@@ -126,6 +126,21 @@
 						</aui:select>
 						
 						</c:if>
+						
+						<c:if test="${fn:length(userFqans[userVo.idVo]) == 0 }">
+						
+							<div style="display:none;">
+								<aui:select id="fqan_${userVo.idVo }" name="fqan_${userVo.idVo }" label="Roles for ${userVo.vo}" onChange="setValue(${userVo.idVo });">
+												
+									<aui:option value="norole"  selected="true"><liferay-ui:message key="No Role"/></aui:option>
+									
+									
+									
+									
+									
+								</aui:select>
+							</div>
+						</c:if>
 					
 					</div>
 				</c:forEach>
