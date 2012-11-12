@@ -10,11 +10,13 @@
 
 #containerLogin {
 	background-color: #e4e4e4;
+	box-shadow: 10px 10px 5px #888;
 	border: 1px;
 	border-style: solid;
 	border-color: #c1c1c1;
 	border-radius: 5px;
 	padding: 10px 5px 5px 10px;
+	margin-right: 9px;
 }
 
 #presentationLogin {

@@ -85,7 +85,7 @@
 </portlet:actionURL>				 		 
 
 <!-- <liferay-portlet:renderURL plid="11979" portletName="Registration_WAR_Registration4_INSTANCE_W1Nq" var="vaiqui"/> -->
-<liferay-portlet:renderURL plid="12312" portletName="Registration_WAR_Registration4_INSTANCE_7NTSc9EWudEm" var="vaiqui"/>
+<liferay-portlet:renderURL plid="20745" portletName="Registration_WAR_Registration4_INSTANCE_uHPSNQWU9MDI" var="vaiqui"/>
 
 
 <c:if test="<%= !themeDisplay.isSignedIn() %>">
