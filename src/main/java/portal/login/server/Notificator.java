@@ -109,7 +109,7 @@ public class Notificator implements Runnable{
 
 	private void sendMail(String mail, String user, int limit, String voName) {
 		// TODO Auto-generated method stub
-		String text= "Dear " + user + ",\n your proxy expire in " + limit + " minutes.\n\n If necessary renew the proxy into https://portal.italiangrid.it \n\n [If you won't receive this mail go to Advanced option into My Data page and uncheck che option.] \n\n      - Portal Administrators";
+		String text= "Dear " + user + ",\n your proxy will expire in " + limit + " minutes.\n\n If necessary renew the proxy on https://portal.italiangrid.it \n\n [If you don't want to receive this mail go to Advanced option into My Data page and uncheck che option.] \n\n      - Portal Administrators";
 		SendMail sm = new SendMail("igi-portal-admin@lists.italiangrid.it", mail, "Proxy Expiration for " + voName, text);
 		sm.send();
 	}
