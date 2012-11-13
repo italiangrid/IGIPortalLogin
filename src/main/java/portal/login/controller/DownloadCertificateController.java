@@ -30,7 +30,7 @@ import it.italiangrid.portal.dbapi.services.VoService;
 
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.User;
-
+ 
 /**
  * This class is the controller that manage the download of the grid proxy of
  * the user after login.
