@@ -224,7 +224,7 @@
 	<c:if test="${proxyDownloaded}">
 		
 		<c:set var="count" value="0" />
-		<table border="0" width="100%">
+		<table id="proxyTable">
 		
 
 		<c:forTokens items="${proxys}"
@@ -232,7 +232,7 @@
 	                 var="currentName"
 	                 varStatus="status">
 	      
-	        <tr><td>&nbsp</td><td>&nbsp</td><td>&nbsp</td></tr>
+	        <tr><td colspan="3"></td></tr>
 	        <c:out escapeXml="false" value="${currentName}"/>
 	        <c:set var="count" value="${status.count}" />
 			

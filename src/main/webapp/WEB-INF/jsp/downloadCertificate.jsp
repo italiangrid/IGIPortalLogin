@@ -107,7 +107,7 @@
 			<c:if test="${fn:length(userVos) > 1}">
 				
 				
-				<strong>Select VO:</storng><br/>
+				<strong>Select VO:</strong><br/>
 				<select id="<portlet:namespace/>vosId" name="<portlet:namespace/>vosId" onChange="showRoleList();">
 					
 					<c:forEach var="userVo" items="${userVos}">

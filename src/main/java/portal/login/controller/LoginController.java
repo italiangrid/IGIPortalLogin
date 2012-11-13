@@ -57,8 +57,7 @@ import org.globus.gsi.GlobusCredentialException;
 public class LoginController {
 
 	/**
-	 * Logger of the class DownloadCertificateController. TODO to substitute it
-	 * with slf4j.
+	 * Logger of the class DownloadCertificateController. 
 	 */
 	private static final Logger log = Logger.getLogger(LoginController.class);
 
@@ -125,9 +124,6 @@ public class LoginController {
 						+ user.getUserId() + "/x509up."
 						+ vo.getVo());
 
-//				File proxyFile = new File(dir + "/users/" + user.getUserId()
-//						+ "/x509up");
-	
 				if (proxyVoFile.exists()) {
 					try {
 						GlobusCredential cred = new GlobusCredential(
@@ -135,36 +131,10 @@ public class LoginController {
 						if (cred.getTimeLeft() > 0) {
 							return true;
 						} else {
-							
-	//						UserInfo userInfo = userInfoService.findByUsername(user
-	//								.getScreenName());
-	//
-	//						File credFile = new File(dir + "/users/"
-	//								+ user.getUserId() + "/.creds");
-	//						File proxyVoFile = null;
-	//						credFile.delete();
-	//						proxyFile.delete();
-	//
-	//						List<Vo> vos = userToVoService.findVoByUserId(userInfo
-	//								.getUserId());
-	//						for (Iterator<Vo> iterator = vos.iterator(); iterator
-	//								.hasNext();) {
-	//							Vo vo = (Vo) iterator.next();
-	//							proxyVoFile = new File(dir + "/users/"
-	//									+ user.getUserId() + "/x509up."
-	//									+ vo.getVo());
-	//							if(proxyVoFile.exists()){
-	//								cred = new GlobusCredential(
-	//										proxyVoFile.toString());
-	//								if(cred.getTimeLeft() <= 0)
-										proxyVoFile.delete();
-	//							}
-	//						}
-	
+							proxyVoFile.delete();
 							SessionMessages.add(request, "proxy-expired-deleted");
 						}
 					} catch (GlobusCredentialException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 						log.info("e mò sono cazzi amari");
 					}
@@ -270,7 +240,6 @@ public class LoginController {
 									stdout));
 							String line = null;
 							
-							boolean check = true;
 							List<String> tmpRole = new ArrayList<String>();
 							
 							
