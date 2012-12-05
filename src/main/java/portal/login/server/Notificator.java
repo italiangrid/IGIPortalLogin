@@ -16,7 +16,7 @@ public class Notificator implements Runnable {
 
 	public void run() {
 		try {
-			log.debug("############## NOTIFICATOR ##############");
+			log.debug("############## NOTIFICATOR ##############"); 
 
 			LoadProperties props = new LoadProperties("checkProxy.properties");
 
@@ -49,8 +49,9 @@ public class Notificator implements Runnable {
 
 				if (proxy.exists()) {
 
-					long[] expirationTime = getExpirationTime(proxyFile);
+					long[] expirationTime = getExpirationTime(proxyFile,valid);
 					if (expirationTime != null) {
+						
 						if ((expirationTime[1] < (long) limit)
 								&& (expirationTime[0] == 0)) {
 
@@ -58,16 +59,21 @@ public class Notificator implements Runnable {
 
 							switch (limit) {
 							case 60:
-								if (tryToRenewProxy(proxyFile, voName, valid,
-										role)) {
-
-									props.putValue(key,
-											value.replace("60", "30"));
-
-									log.info("60  minutes limit");
-
-									sendMail(mail, user, limit, voName);
+								String newValid = expirationTime[3] +":"+expirationTime[4];
+								
+								if(expirationTime[3]>1){
+									if (tryToRenewProxy(proxyFile, voName, newValid,
+											role)) {
+										break;
+									}
 								}
+								props.putValue(key,
+										value.replace("60", "30"));
+
+								log.info("60  minutes limit");
+								
+								sendMail(mail, user, limit, voName);
+								
 								break;
 							case 30:
 								props.deleteValue(key);
@@ -77,6 +83,9 @@ public class Notificator implements Runnable {
 								sendMail(mail, user, limit, voName);
 								break;
 							}
+						}else{
+							
+							
 						}
 					}
 				}
@@ -89,11 +98,36 @@ public class Notificator implements Runnable {
 		}
 	}
 
-	private long[] getExpirationTime(String proxyFile) {
+	private long[] getExpirationTime(String proxyFile, String valid) {
 
 		long[] result = null;
 
 		try {
+			String cmd2 = "voms-proxy-info -timeleft -file " + proxyFile;
+			log.info("cmd = " + cmd2);
+			Process p2 = Runtime.getRuntime().exec(cmd2);
+			InputStream stdout2 = p2.getInputStream();
+			InputStream stderr2 = p2.getErrorStream();
+			
+			BufferedReader output2 = new BufferedReader(new InputStreamReader(
+					stdout2));
+			String line2 = null;
+
+			long timeleftProxy=0;
+			
+			while ((line2 = output2.readLine()) != null) {
+				log.info("[Stdout] " + line2);
+				timeleftProxy = Long.parseLong(line2);
+			}
+			
+			output2.close();
+
+			BufferedReader brCleanUp2 = new BufferedReader(
+					new InputStreamReader(stderr2));
+			while ((line2 = brCleanUp2.readLine()) != null) {
+
+				log.error("[Stderr] " + line2);
+			}
 
 			String cmd = "voms-proxy-info -actimeleft -file " + proxyFile;
 
@@ -106,15 +140,22 @@ public class Notificator implements Runnable {
 					stdout));
 			String line = null;
 
+			long totalSecs=0;
+			
 			while ((line = output.readLine()) != null) {
 				log.info("[Stdout] " + line);
-				long totalSecs = Long.parseLong(line);
+				totalSecs = Long.parseLong(line);
+				
 				long hours = totalSecs / 3600;
 				long minutes = (totalSecs % 3600) / 60;
 				long seconds = totalSecs % 60;
+				
+				long validHours = timeleftProxy / 3600;
+				long validMinutes = (timeleftProxy % 3600) /60;
 
-				long[] newResult = { hours, minutes, seconds };
+				long[] newResult = { hours, minutes, seconds, validHours, validMinutes };
 				result = newResult;
+				
 			}
 
 			output.close();
@@ -146,11 +187,11 @@ public class Notificator implements Runnable {
 			String cmd = "voms-proxy-init -noregen -cert " + proxy + " -key "
 					+ proxy + " -out " + proxyFile + " -valid " + valid
 					+ " -voms " + voName;
-			log.debug(cmd);
+			log.info(cmd);
 			if (!role.equals("norole")) {
 				cmd += ":" + role;
 			}
-			log.debug("cmd = " + cmd);
+			log.info("cmd = " + cmd);
 			Process p = Runtime.getRuntime().exec(cmd);
 			InputStream stdout = p.getInputStream();
 			InputStream stderr = p.getErrorStream();
@@ -160,7 +201,7 @@ public class Notificator implements Runnable {
 			String line = null;
 
 			while ((line = output.readLine()) != null) {
-				log.debug("[Stdout] " + line);
+				log.info("[Stdout] " + line);
 			}
 			output.close();
 
@@ -169,8 +210,9 @@ public class Notificator implements Runnable {
 			BufferedReader brCleanUp = new BufferedReader(
 					new InputStreamReader(stderr));
 			while ((line = brCleanUp.readLine()) != null) {
-				error = true;
+				
 				if (!line.contains("....")) {
+					error = true;
 					log.error("[Stderr] " + line);
 				}
 			}
@@ -178,6 +220,7 @@ public class Notificator implements Runnable {
 			brCleanUp.close();
 			if (error == true)
 				return false;
+			
 			return true;
 
 		} catch (IOException e) {

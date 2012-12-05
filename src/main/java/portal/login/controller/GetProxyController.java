@@ -346,7 +346,7 @@ public class GetProxyController {
 			String line = null;
 
 			while ((line = output.readLine()) != null) {
-				log.debug("[Stdout] " + line);
+				log.error("[Stdout] " + line);
 			}
 			output.close();
 			
