@@ -174,6 +174,15 @@ public class GetProxyController {
 		String username = user.getScreenName();
 
 		UserInfo userInfo = userInfoService.findByUsername(username);
+		
+		Notify n = notifyService.findByUserInfo(userInfo);
+		
+		if(n==null){
+			notifyService.save(new Notify(userInfo, "false"));
+			n = notifyService.findByUserInfo(userInfo);
+		}
+		
+		
 		Vo selectedVo =null;
 		if(vo == 0){
 			String tmp = userToVoService.findDefaultVo(userInfo.getUserId());
@@ -244,6 +253,11 @@ public class GetProxyController {
 			Util.setFilePermissions(proxyFileVO.toString(), 600);
 			globusCred.save(out);
 			
+			if(!n.getProxyExpireTime().equals("12:00"))
+				valid=n.getProxyExpireTime();
+			
+			log.error("Now Valid is: "+valid);
+			
 			boolean vomsproxyinit = myVomsProxyInit(proxyFileVO.toString(), selectedVo.getVo(), role, valid, request);
 
 
@@ -260,12 +274,7 @@ public class GetProxyController {
 				SessionMessages.add(request, "proxy-download-success");
 				
 				log.debug("@@@@ TEST @@@@");
-				Notify n = notifyService.findByUserInfo(userInfo);
 				
-				if(n==null){
-					notifyService.save(new Notify(userInfo, "false"));
-					n = notifyService.findByUserInfo(userInfo);
-				}
 				log.debug("@@@@" + n.getProxyExpire());
 				log.debug("@@@@ TEST @@@@");
 				
@@ -273,7 +282,7 @@ public class GetProxyController {
 				if(n.getProxyExpire().equals("true")){
 					log.debug("è richiesta la notifica");
 					
-					props.putValue(n.getIdNotify()+"."+selectedVo.getVo(), proxyFileVO.toString()+";"+60+";"+userInfo.getMail()+";"+userInfo.getFirstName());
+					props.putValue(n.getIdNotify()+"."+selectedVo.getVo(), proxyFileVO.toString()+";"+60+";"+userInfo.getMail()+";"+userInfo.getFirstName()+";"+valid+";"+role);
 				}else{
 					log.debug("non è richiesta la notifica");
 					props.deleteValue(n.getIdNotify()+"."+selectedVo.getVo());
