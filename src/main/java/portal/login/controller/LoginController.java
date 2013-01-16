@@ -2,12 +2,14 @@ package portal.login.controller;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 import javax.portlet.PortletConfig;
 import javax.portlet.PortletURL;
@@ -97,6 +99,50 @@ public class LoginController {
 	@ModelAttribute("idps")
 	public List<Idp> getIdps() {
 		return idpService.getAllIdp();
+	}
+	
+	@ModelAttribute("vaiqui")
+	public String getMydataUrl() {
+
+		/*
+		 * 1 prendi file
+		 * 2 leggi prop proxy.expiration.times
+		 * 3 parsa e metti in array
+		 */
+		
+		
+		//1
+		
+		String contextPath = LoginController.class.getClassLoader()
+				.getResource("").getPath();
+		
+		String result = "";
+
+		File test = new File(contextPath + "/content/MyProxy.properties");
+		if (test.exists()) {
+			
+			try {
+				FileInputStream inStream = new FileInputStream(contextPath
+						+ "/content/MyProxy.properties");
+
+				Properties prop = new Properties();
+
+				prop.load(inStream);
+
+				inStream.close();
+				
+				//2
+				result = prop.getProperty("mydata.url");
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		
+ 		
+		return result;
 	}
 
 	/**
@@ -303,7 +349,7 @@ public class LoginController {
 							button += "<div id=\"tooltipImg\"><a href=\"#warning\"><img src=\"" + request.getContextPath() + "/images/alert.png\" width=\"24\" height=\"24\" style=\"float: right; padding-right:10px;\"/></a></div>";
 						}else{
 							timeLeft = "<span style=\"color:#63AC68\"><strong>" + timeLeft + "</strong></span>";
-							button += "<div id=\"tooltipImg\"><a href=\"#allOK\"><img src=\"" + request.getContextPath() + "/images/check.png\" width=\"24\" height=\"24\" style=\"float: right; padding-right:10px;\"/></a></div>";
+							button += "<div id=\"tooltipImg\"><a href=\"#allOK\"><img src=\"" + request.getContextPath() + "/images/NewCheck.png\" width=\"24\" height=\"24\" style=\"float: right; padding-right:10px;\"/></a></div>";
 						}
 						
 						

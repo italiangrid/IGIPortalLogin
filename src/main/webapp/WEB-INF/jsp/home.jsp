@@ -84,10 +84,6 @@
 	<portlet:param name="myaction" value="getProxy" />
 </portlet:actionURL>				 		 
 
-<!-- <liferay-portlet:renderURL plid="11979" portletName="Registration_WAR_Registration4_INSTANCE_W1Nq" var="vaiqui"/> -->
-<liferay-portlet:renderURL plid="20745" portletName="Registration_WAR_Registration4_INSTANCE_uHPSNQWU9MDI" var="vaiqui"/>
-
-
 <c:if test="<%= !themeDisplay.isSignedIn() %>">
 
 	<span style="color:red"><strong>Effettua il Login per visualizzare le tue informazioni.</strong></span>
@@ -143,13 +139,11 @@
 		<c:choose>
 		
 			<c:when test="${voNumber == 0 }">
-			
+				<br/>
 				<div class="portlet-msg-error"> Your registration isn't COMPLETE.</div>
 				
-				<br/>
-				Terminate your registration <aui:a href="${vaiqui}">HERE</aui:a>.
 				
-				<br/><br/>
+				<br/>
 			</c:when>
 			<c:when test="${voNumber == 1 }">
 				

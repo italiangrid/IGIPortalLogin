@@ -1,5 +1,7 @@
 package portal.login.controller;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -160,6 +162,48 @@ public class DownloadCertificateController {
 		}
 		
 		return x;
+	}
+	
+	@ModelAttribute("vaiqui")
+	public String getMydataUrl() {
+
+		/*
+		 * 1 prendi file
+		 * 2 leggi prop proxy.expiration.times
+		 * 3 parsa e metti in array
+		 */
+		
+		
+		//1
+		
+		String contextPath = DownloadCertificateController.class.getClassLoader()
+				.getResource("").getPath();
+		
+		String result = "";
+
+		File test = new File(contextPath + "/content/MyProxy.properties");
+		if (test.exists()) {
+			
+			try {
+				FileInputStream inStream = new FileInputStream(contextPath
+						+ "/content/MyProxy.properties");
+
+				Properties prop = new Properties();
+
+				prop.load(inStream);
+
+				inStream.close();
+				
+				//2
+				result = prop.getProperty("mydata.url");
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		return result;
 	}
 	
 }
