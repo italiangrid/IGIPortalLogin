@@ -100,10 +100,9 @@ public class DownloadCertificateController {
 		for (Vo vo : vos) {
 			File check = new File(dir + "/users/"+ userId+"/x509up."+vo.getVo());
 			
-			if(!check.exists())
+			if(!check.exists()&&(vo.getConfigured().equals("true")))
 				results.add(vo);
 		}
-		
 		
 		return results;
 	}
@@ -143,8 +142,6 @@ public class DownloadCertificateController {
 			if(!check.exists())
 				results.add(vo.getIdVo());
 		}
-		
-		
 		
 		List<UserToVo> utv = userToVoService.findById(userInfo.getUserId());
 		

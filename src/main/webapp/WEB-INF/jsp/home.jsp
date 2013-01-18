@@ -134,16 +134,16 @@
 
 <liferay-ui:error key="proxy-download-problem"
 	message="proxy-download-problem" />
-	
 	<c:if test="${!proxyDownloaded}">
 		<c:choose>
 		
 			<c:when test="${voNumber == 0 }">
 				<br/>
-				<div class="portlet-msg-error"> Your registration isn't COMPLETE.</div>
+				<div class="portlet-msg-error"> Your registration isn't COMPLETE or all your VO aren't configurated in the portal, in this case an e-mail was sent to the Portal Administrators.</div>
+				<p>Check your settings <a href="${vaiqui }">HERE</a>.</p>
 				
 				
-				<br/>
+				
 			</c:when>
 			<c:when test="${voNumber == 1 }">
 				

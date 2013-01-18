@@ -170,7 +170,7 @@ public class LoginController {
 						+ user.getUserId() + "/x509up."
 						+ vo.getVo());
 
-				if (proxyVoFile.exists()) {
+				if (proxyVoFile.exists()&&vo.getConfigured().equals("true")) {
 					try {
 						GlobusCredential cred = new GlobusCredential(
 								proxyVoFile.toString());
@@ -201,7 +201,13 @@ public class LoginController {
 			String username = user.getScreenName();
 
 			UserInfo userInfo = userInfoService.findByUsername(username);
-			return userToVoService.findVoByUserId(userInfo.getUserId()).size();
+			List<Vo> vos = userToVoService.findVoByUserId(userInfo.getUserId());
+			int count = 0;
+			for(Vo vo: vos){
+				if(vo.getConfigured().equals("true"))
+					count++;
+			}
+			return count;
 		}
 		return 0;
 	}
@@ -219,7 +225,9 @@ public class LoginController {
 			if(userToVoService.findVoByUserId(userInfo.getUserId()).size()==1){
 				List<UserToVo> utvs = userToVoService.findById(userInfo.getUserId());
 				UserToVo utv = utvs.get(0);
-				return utv.getFqans();
+				Vo vo = userToVoService.findVoByUserId(userInfo.getUserId()).get(0);
+				if(vo.getConfigured().equals("true"))
+					return utv.getFqans();
 			}
 		}
 		return null;
@@ -252,7 +260,7 @@ public class LoginController {
 						+ user.getUserId() + "/x509up."
 						+ vo.getVo());
 				
-				if(proxyVoFile.exists()){
+				if(proxyVoFile.exists()&&vo.getConfigured().equals("true")){
 					
 					GlobusCredential cred = new GlobusCredential(
 							proxyVoFile.toString());
