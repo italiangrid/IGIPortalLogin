@@ -57,7 +57,7 @@
 
 </script>
 
-<div id="containerLogin"> 
+<div id="containerLogin2"> 
 
 <portlet:actionURL var="getProxyUrl">
 	<portlet:param name="myaction" value="getProxy" />
@@ -77,11 +77,6 @@
 				Hi <strong><c:out
 						value="<%=((User) request.getAttribute(WebKeys.USER)).getFirstName() %>"></c:out>
 				</strong>
-				</div>
-			</aui:column>
-			<aui:column columnWidth="30">
-				<div id="linkImg">
-					<aui:a href="${vaiqui}" onmouseover="viewTooltip('#settings');"><img src="<%=request.getContextPath()%>/images/advancedsettings.png" alt="User settings" width="24" height="24" style="float: right; padding-right:10px;" /></aui:a>
 				</div>
 			</aui:column>
 		</div>
@@ -189,8 +184,6 @@
 
 			<aui:button-row>
 				<aui:button type="submit" value="Download"/>
-				<aui:button type="cancel" value="Back"
-						onClick="location.href='${homeUrl}';" />
 			</aui:button-row>
 
 		</aui:fieldset>

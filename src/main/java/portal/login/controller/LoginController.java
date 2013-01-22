@@ -15,6 +15,7 @@ import javax.portlet.PortletConfig;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderResponse;
 import javax.portlet.RenderRequest;
+import javax.portlet.WindowStateException;
 //import portal.login.domain.Idp;
 //import portal.login.domain.UserInfo;
 //import portal.login.domain.UserToVo;
@@ -38,6 +39,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
 
+import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.JavaConstants;
@@ -89,6 +91,11 @@ public class LoginController {
 	@RenderMapping
 	public String showLogin(RenderResponse response) {
 		return "home";
+	}
+	
+	@RenderMapping(params = "myaction=success")
+	public String showSuccess(RenderResponse response) {
+		return "success";
 	}
 
 	/**
@@ -349,8 +356,14 @@ public class LoginController {
 						PortletURL url = response.createRenderURL();
 						url.setParameter("myaction", "showRenewProxy");
 						url.setParameter("idVo", Integer.toString(vo.getIdVo()));
+						try {
+							url.setWindowState(LiferayWindowState.POP_UP);
+						} catch (WindowStateException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 //						String button = "<input type=\"submit\" value=\"Renew\" onClick=\"location.href=\'"+url+"\';\"></input>";
-						String button = "<div id=\"linkImg\"><a href=\""+url+"\" onmouseover=\"viewTooltip('#renewButton');\"><img src=\"" + request.getContextPath() + "/images/update.png\" width=\"24\" height=\"24\" style=\"float: right; padding-right:10px;\"/></a></div>";
+						String button = "<div id=\"linkImg\"><a href=\""+url+"\" onmouseover=\"viewTooltip('#renewButton');\" onclick=\"$(this).modal({width:400, height:250, message:true}).open(); return false;\"><img src=\"" + request.getContextPath() + "/images/update.png\" width=\"24\" height=\"24\" style=\"float: right; padding-right:10px;\"/></a></div>";
 						String timeLeft = hours + ":" + minutes +  ":" + seconds;
 						if(hours < 1){
 							timeLeft = "<span style=\"color:red\"><strong>" + timeLeft + "</strong></span>";

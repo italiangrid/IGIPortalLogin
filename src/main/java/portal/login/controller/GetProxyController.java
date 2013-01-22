@@ -287,6 +287,8 @@ public class GetProxyController {
 					log.debug("non è richiesta la notifica");
 					props.deleteValue(n.getIdNotify()+"."+selectedVo.getVo());
 				}
+				
+				response.setRenderParameter("myaction", "success");
 			} else {
 				SessionErrors.add(request, "proxy-download-problem");
 			}

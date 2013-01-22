@@ -35,7 +35,9 @@
 <%@ page import="com.liferay.portal.service.permission.PortalPermissionUtil" %>
 <%@ page import="com.liferay.portal.service.permission.PortletPermissionUtil"%> 
 <%@ page import="com.liferay.portal.model.User"%>
+<%@ page import="com.liferay.portal.kernel.portlet.LiferayWindowState" %>
 <%@ page import="javax.portlet.PortletURL" %>
+
 
 <portlet:defineObjects />	
 <liferay-theme:defineObjects />
