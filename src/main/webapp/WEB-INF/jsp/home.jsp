@@ -326,7 +326,7 @@
 		
 			<c:when test="${voNumber == 0 }">
 				<br/>
-				<div class="portlet-msg-error"> Your registration isn't COMPLETE or all your VO aren't configurated in the portal, in this case an e-mail was sent to the Portal Administrators.</div>
+				<div class="portlet-msg-error"> None of your VOs is enabled in the portal yet.</div>
 				<p>Check your settings <a href="${vaiqui }">HERE</a>.</p>
 				
 				
@@ -368,7 +368,7 @@
 									<liferay-portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>" var="downloadProxy">
 									<portlet:param name="myaction" value="downloadCertificate" />
 									</liferay-portlet:renderURL>
-									<aui:button type="button" value="Get proxy" onclick="$(this).modal({width:400, height:250, message:true, src: '${downloadProxy }'}).open(); return false;"/>	
+									<aui:button type="button" value="Get proxy" onclick="$(this).modal({width:400, height:300, message:true, src: '${downloadProxy }'}).open(); return false;"/>	
 				
 							</aui:button-row>
 						
@@ -403,7 +403,7 @@
 						<liferay-portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>" var="downloadProxy">
 						<portlet:param name="myaction" value="downloadCertificate" />
 						</liferay-portlet:renderURL>
-						<aui:button type="button" value="Get proxy for other VO" onclick="$(this).modal({width:400, height:250, message:true, src: '${downloadProxy }'}).open(); return false;"/>	
+						<aui:button type="button" value="Get proxy for other VO" onclick="$(this).modal({width:400, height:300, message:true, src: '${downloadProxy }'}).open(); return false;"/>	
 				</aui:button-row>
 					
 			</aui:form>

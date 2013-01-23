@@ -31,10 +31,8 @@
 		<aui:fieldset>
 
 			<aui:column>
-				<strong>VO <c:out value="${Vo.vo }"></c:out> </strong>
+				<strong>Your working VO is <c:out value="${Vo.vo }"></c:out>, insert the password set during the registration.</strong>
 				<br/>
-				Insert your password.
-				<br/>	
 				<aui:input name="vosId" type="hidden"
 								value="${Vo.idVo}" />
 					
@@ -73,7 +71,7 @@
 					
 			
 			<aui:input name="proxyPass" type="password"
-							label="Proxy Password" style="background: #ACDFA7;"/>
+							label="Password" style="background: #ACDFA7;"/>
 
 			</aui:column>
 
