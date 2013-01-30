@@ -230,7 +230,7 @@
 	width: 100%;
 	margin: 0;
 	padding: 0;
-	background: #131313;
+	background: url(/Login-1.1/images/overlay2.png) repeat;
 	opacity: .85;
 	filter: alpha(opacity=85);
 	z-index: 101;
@@ -336,7 +336,7 @@
 				
 				<br/> 
 				
-				<div class="portlet-msg-error"> No VO selected. Insert your proxy password and get proxy.</div>
+				<div class="portlet-msg-error"> None VOs in use. Click the button below to retrieve your credentials.</div>
 				
 				<br/>
 				
@@ -348,7 +348,7 @@
 						<liferay-portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>" var="downloadProxy">
 						<portlet:param name="myaction" value="downloadCertificate" />
 						</liferay-portlet:renderURL>
-						<aui:button type="button" value="Get proxy" onclick="$(this).modal({width:400, height:250, message:true, src: '${downloadProxy }'}).open(); return false;"/>	
+						<aui:button type="button" value="Get Credentials" onclick="$(this).modal({width:400, height:300, message:true, src: '${downloadProxy }'}).open(); return false;"/>	
 				
 					</aui:button-row>
 				</aui:form>
@@ -357,7 +357,7 @@
 				
 				<br/> 
 				
-				<div class="portlet-msg-error"> No VO selected. Choose a VO to use clicking the button below.</div>
+				<div class="portlet-msg-error"> None VOs in use. Click the button below to retrieve your credentials.</div>
 				
 				<br/>
 				 
@@ -368,7 +368,7 @@
 									<liferay-portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>" var="downloadProxy">
 									<portlet:param name="myaction" value="downloadCertificate" />
 									</liferay-portlet:renderURL>
-									<aui:button type="button" value="Get proxy" onclick="$(this).modal({width:400, height:300, message:true, src: '${downloadProxy }'}).open(); return false;"/>	
+									<aui:button type="button" value="Get Credentials" onclick="$(this).modal({width:400, height:300, message:true, src: '${downloadProxy }'}).open(); return false;"/>	
 				
 							</aui:button-row>
 						

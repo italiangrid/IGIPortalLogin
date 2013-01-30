@@ -97,6 +97,11 @@ public class LoginController {
 	public String showSuccess(RenderResponse response) {
 		return "success";
 	}
+	
+	@RenderMapping(params = "myaction=error")
+	public String showError(RenderResponse response) {
+		return "error";
+	}
 
 	/**
 	 * Present to the portlet a list of the IDP supported by the portal.
@@ -363,7 +368,7 @@ public class LoginController {
 							e.printStackTrace();
 						}
 //						String button = "<input type=\"submit\" value=\"Renew\" onClick=\"location.href=\'"+url+"\';\"></input>";
-						String button = "<div id=\"linkImg\"><a href=\""+url+"\" onmouseover=\"viewTooltip('#renewButton');\" onclick=\"$(this).modal({width:400, height:250, message:true}).open(); return false;\"><img src=\"" + request.getContextPath() + "/images/update.png\" width=\"24\" height=\"24\" style=\"float: right; padding-right:10px;\"/></a></div>";
+						String button = "<div id=\"linkImg\"><a href=\""+url+"\" onmouseover=\"viewTooltip('#renewButton');\" onclick=\"$(this).modal({width:400, height:300, message:true}).open(); return false;\"><img src=\"" + request.getContextPath() + "/images/update.png\" width=\"24\" height=\"24\" style=\"float: right; padding-right:10px;\"/></a></div>";
 						String timeLeft = hours + ":" + minutes +  ":" + seconds;
 						if(hours < 1){
 							timeLeft = "<span style=\"color:red\"><strong>" + timeLeft + "</strong></span>";

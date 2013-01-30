@@ -57,6 +57,7 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.User;
+import com.liferay.portal.util.PortalUtil;
 
 /**
  * This class is used for store proxy to the disk and destroy proxy from the
@@ -289,8 +290,19 @@ public class GetProxyController {
 				}
 				
 				response.setRenderParameter("myaction", "success");
+//				String completeurl = PortalUtil.getCurrentCompleteURL(PortalUtil.getHttpServletRequest(request));
+//				log.error(completeurl);
+//				
+//				String url = completeurl.substring(0, completeurl.indexOf("?"));
+//				
+//				log.error(url);
+//				
+//				response.sendRedirect(url);
+				
 			} else {
 				SessionErrors.add(request, "proxy-download-problem");
+				response.setRenderParameter("myaction", "showRenewProxy");
+				response.setRenderParameter("idVo", String.valueOf(selectedVo.getIdVo()));
 			}
 
 		} catch (MyProxyException e) {
@@ -299,13 +311,15 @@ public class GetProxyController {
 			SessionErrors.add(request, "proxy-download-problem");
 			log.error("***** errore myproxy " + e.getMessage()
 					+ " MyProxyException *****");
-			response.setRenderParameter("myaction", "idps");
+			response.setRenderParameter("myaction", "showRenewProxy");
+			response.setRenderParameter("idVo", String.valueOf(selectedVo.getIdVo()));
 
 		} catch (IllegalArgumentException e) {
 			
 			SessionErrors.add(request, "proxy-download-problem");
 			log.error("***** errore myproxy IllegalArgumentException *****");
-			response.setRenderParameter("myaction", "idps");
+			response.setRenderParameter("myaction", "showRenewProxy");
+			response.setRenderParameter("idVo", String.valueOf(selectedVo.getIdVo()));
 
 		} catch (FileNotFoundException e) {
 			

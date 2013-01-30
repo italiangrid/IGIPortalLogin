@@ -94,7 +94,8 @@
 			<aui:column>
 			
 			<c:if test="${fn:length(userVos) == 1}">
-				<strong>Your working VO is <c:forEach var="userVo" items="${userVos}"><c:out value="${userVo.vo }"></c:out><aui:input name="vosId" type="hidden" value="${userVo.idVo}" /></c:forEach>, insert the password set during the registration.</strong>
+				Insert the password set during the registration.<br/><br/>
+				Your VO is <strong><c:forEach var="userVo" items="${userVos}"><c:out value="${userVo.vo }"></c:out><aui:input name="vosId" type="hidden" value="${userVo.idVo}" /></c:forEach></strong>
 					
 				
 			</c:if>
@@ -102,7 +103,7 @@
 			<c:if test="${fn:length(userVos) > 1}">
 				
 				
-				<strong>Please choose your working VO and insert the password set during the registration.</strong><br/><br/>
+				Choose a working VO and insert the password set during the registration.<br/><br/>
 				<select id="<portlet:namespace/>vosId" name="<portlet:namespace/>vosId" onChange="showRoleList();">
 					
 					<c:forEach var="userVo" items="${userVos}">
@@ -183,7 +184,7 @@
 			</aui:column>
 			
 			<aui:button-row>
-				<aui:button type="submit" value="Download"/>
+				<aui:button type="submit" value="Get Credentials"/>
 			</aui:button-row>
 
 		</aui:fieldset>

@@ -21,7 +21,10 @@
 			</aui:column>
 		</div>
 	</aui:fieldset>
-<br/><br/><br/>
+<br/><br/>
+
+<liferay-ui:error key="proxy-download-problem"
+	message="proxy-download-problem" />
 
 <aui:form name="addUserInfoForm" commandName="userInfo"
 	action="${getProxyUrl}">
@@ -31,7 +34,8 @@
 		<aui:fieldset>
 
 			<aui:column>
-				<strong>Your working VO is <c:out value="${Vo.vo }"></c:out>, insert the password set during the registration.</strong>
+				Insert the password set during the registration.<br/><br/>
+				Your VO is <strong><c:out value="${Vo.vo }"></c:out></strong>
 				<br/>
 				<aui:input name="vosId" type="hidden"
 								value="${Vo.idVo}" />
@@ -76,7 +80,7 @@
 			</aui:column>
 
 			<aui:button-row>
-				<aui:button type="submit" value="Renew"/>
+				<aui:button type="submit" value="Renew Credentials"/>
 			</aui:button-row>
 
 		</aui:fieldset>
