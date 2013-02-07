@@ -9,12 +9,14 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
 
 /*import portal.login.domain.UserInfo;
@@ -80,6 +82,8 @@ public class DownloadCertificateController {
 		log.info("***** faccio il render *****");
 		return "downloadCertificate";
 	}
+	
+	
 	
 	/**
 	 * Return to the portlet the list of the user's vo membership

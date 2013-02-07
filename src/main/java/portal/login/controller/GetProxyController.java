@@ -57,7 +57,6 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.User;
-import com.liferay.portal.util.PortalUtil;
 
 /**
  * This class is used for store proxy to the disk and destroy proxy from the
@@ -289,7 +288,7 @@ public class GetProxyController {
 					props.deleteValue(n.getIdNotify()+"."+selectedVo.getVo());
 				}
 				
-				response.setRenderParameter("myaction", "success");
+				response.setRenderParameter("myaction", "home");
 //				String completeurl = PortalUtil.getCurrentCompleteURL(PortalUtil.getHttpServletRequest(request));
 //				log.error(completeurl);
 //				

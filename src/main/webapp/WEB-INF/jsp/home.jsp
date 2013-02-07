@@ -169,8 +169,8 @@
 					//$close.click(function () { jQuery.modal().close(); location.href='https://halfback.cnaf.infn.it/casshib/shib/app4/login?service=https%3A%2F%2Fgridlab04.cnaf.infn.it%2Fc%2Fportal%2Flogin%3Fp_l_id%3D10671';});
 					$close.click(function () { jQuery.modal().close(); location.href='https://halfback.cnaf.infn.it/casshib/shib/app1/login?service=https%3A%2F%2Fflyback.cnaf.infn.it%2Fc%2Fportal%2Flogin%3Fp_l_id%3D10669';});
 					}else{
-						$close.click(function () { window.location.reload()});
-						$overlay.click(function () { window.location.reload() });
+						$close.click(function () { window.location.href=window.location.href;});
+						$overlay.click(function () { window.location.href=window.location.href; });
 					}
 					
 				}
@@ -260,159 +260,191 @@
 }
 
 </style>
-
-<div id="containerLogin">
-
-<portlet:renderURL var="downloadCertificateUrl">
-	<portlet:param name="myaction" value="downloadCertificate" />
-</portlet:renderURL>		
-
-<portlet:actionURL var="getProxyUrl">
-	<portlet:param name="myaction" value="getProxy" />
-</portlet:actionURL>				 		 
-
-<c:if test="<%= !themeDisplay.isSignedIn() %>">
-
-	<span style="color:red"><strong>Effettua il Login per visualizzare le tue informazioni.</strong></span>
-	<div id="<portlet:namespace/>soloAdmin" style="display: none;">
-		<aui:select id="idpId" name="idpId" label="IDP" onChange="goLogin();">
-
-			<aui:option value="">
-				<liferay-ui:message key="Seleziona IDP per Login" />
-			</aui:option>
-			<c:forEach var="idpi" items="${idps}">
-				<aui:option value="${idpi.idploginAddress}">
-					<liferay-ui:message key="${idpi.idpname}" />
+<c:set var="aws" value="<%= renderRequest.getWindowState()%>"/>
+<c:set var="puws" value="<%= LiferayWindowState.POP_UP.toString()%>"/>
+<c:if test="${aws!=puws }">
+	<div id="containerLogin">
+	
+	<portlet:renderURL var="downloadCertificateUrl">
+		<portlet:param name="myaction" value="downloadCertificate" />
+	</portlet:renderURL>		
+	
+	<portlet:actionURL var="getProxyUrl">
+		<portlet:param name="myaction" value="getProxy" />
+	</portlet:actionURL>				 		 
+	
+	<c:if test="<%= !themeDisplay.isSignedIn() %>">
+	
+		<span style="color:red"><strong>Effettua il Login per visualizzare le tue informazioni.</strong></span>
+		<div id="<portlet:namespace/>soloAdmin" style="display: none;">
+			<aui:select id="idpId" name="idpId" label="IDP" onChange="goLogin();">
+	
+				<aui:option value="">
+					<liferay-ui:message key="Seleziona IDP per Login" />
 				</aui:option>
-			</c:forEach>
-
-		</aui:select>
-	</div>
-</c:if>
-
-<c:if test="<%= themeDisplay.isSignedIn() %>">
-
-	<aui:fieldset>
-		<div id="presentationLogin">
-			<aui:column columnWidth="70">
-				<div style="height: 28px; display:table-cell; vertical-align:bottom;">
-				Hi <strong><c:out
-						value="<%=((User) request.getAttribute(WebKeys.USER)).getFirstName() %>"></c:out>
-				</strong>
-				</div>
-			</aui:column>
-			<aui:column columnWidth="30">
-				<div id="linkImg">
-					<aui:a href="${vaiqui}" onmouseover="viewTooltip('#settings');"><img src="<%=request.getContextPath()%>/images/advancedsettings.png" alt="User settings" width="24" height="24" style="float: right; padding-right:10px;" /></aui:a>
-				</div>
-			</aui:column>
+				<c:forEach var="idpi" items="${idps}">
+					<aui:option value="${idpi.idploginAddress}">
+						<liferay-ui:message key="${idpi.idpname}" />
+					</aui:option>
+				</c:forEach>
+	
+			</aui:select>
 		</div>
-	</aui:fieldset>
+	</c:if>
 	
-			
-	<br/> <br/>
-	
-	<liferay-ui:success key="proxy-download-success"
-	message="proxy-download-success" />
-<liferay-ui:success key="proxy-destroy-success"
-	message="proxy-destroy-success" />
-<liferay-ui:success key="proxy-expired-deleted"
-	message="proxy-expired-deleted" />
-
-<liferay-ui:error key="proxy-download-problem"
-	message="proxy-download-problem" />
-	<c:if test="${!proxyDownloaded}">
-		<c:choose>
+	<c:if test="<%= themeDisplay.isSignedIn() %>">
+		<aui:fieldset>
+			<div id="presentationLogin">
+				<aui:column columnWidth="70">
+					<div style="height: 28px; display:table-cell; vertical-align:bottom;">
+					Hi <strong><c:out
+							value="<%=((User) request.getAttribute(WebKeys.USER)).getFirstName() %>"></c:out>
+					</strong>
+					</div>
+				</aui:column>
+				<aui:column columnWidth="30">
+					<div id="linkImg">
+						<aui:a href="${vaiqui}" onmouseover="viewTooltip('#settings');"><img src="<%=request.getContextPath()%>/images/advancedsettings.png" alt="User settings" width="24" height="24" style="float: right; padding-right:10px;" /></aui:a>
+					</div>
+				</aui:column>
+			</div>
+		</aui:fieldset>
 		
-			<c:when test="${voNumber == 0 }">
-				<br/>
-				<div class="portlet-msg-error"> None of your VOs is enabled in the portal yet.</div>
-				<p>Check your settings <a href="${vaiqui }">HERE</a>.</p>
 				
-				
-				
-			</c:when>
-			<c:when test="${voNumber == 1 }">
-				
-				<br/> 
-				
-				<div class="portlet-msg-error"> None VOs in use. Click the button below to retrieve your credentials.</div>
-				
-				<br/>
-				
-				<aui:form name="addUserInfoForm" commandName="userInfo" action="${getProxyUrl}">
+		<br/> <br/>
+		
+		<liferay-ui:success key="proxy-download-success"
+		message="proxy-download-success" />
+	<liferay-ui:success key="proxy-destroy-success"
+		message="proxy-destroy-success" />
+	<liferay-ui:success key="proxy-expired-deleted"
+		message="proxy-expired-deleted" />
 	
+	<liferay-ui:error key="proxy-download-problem"
+		message="proxy-download-problem" />
+		<c:if test="${!proxyDownloaded}">
+			<c:choose>
+			
+				<c:when test="${voNumber == 0 }">
+					<br/>
+					<div class="portlet-msg-error"> None of your VOs is enabled in the portal yet.</div>
+					<p>Check your settings <a href="${vaiqui }">HERE</a>.</p>
 					
+					
+					
+				</c:when>
+				<c:when test="${voNumber == 1 }">
+					
+					<br/> 
+					
+					<div class="portlet-msg-error"> None VOs in use. Click the button below to retrieve your credentials.</div>
+					
+					<br/>
+					
+					<aui:form name="addUserInfoForm" commandName="userInfo" action="${getProxyUrl}">
+		
+						
+		
+						<aui:button-row>
+							<liferay-portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>" var="downloadProxy">
+							<portlet:param name="myaction" value="downloadCertificate" />
+							</liferay-portlet:renderURL>
+							<aui:button type="button" value="Get Credentials" onclick="$(this).modal({width:400, height:300, message:true, src: '${downloadProxy }'}).open(); return false;"/>	
+					
+						</aui:button-row>
+					</aui:form>
+				</c:when>
+				<c:otherwise>
+					
+					<br/> 
+					
+					<div class="portlet-msg-error"> None VOs in use. Click the button below to retrieve your credentials.</div>
+					
+					<br/>
+					 
+					<aui:form name="catalogForm"
+							action="${downloadCertificateUrl}">
+							
+								<aui:button-row>
+										<liferay-portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>" var="downloadProxy">
+										<portlet:param name="myaction" value="downloadCertificate" />
+										</liferay-portlet:renderURL>
+										<aui:button type="button" value="Get Credentials" onclick="$(this).modal({width:400, height:300, message:true, src: '${downloadProxy }'}).open(); return false;"/>	
+					
+								</aui:button-row>
+							
+					</aui:form>
+				</c:otherwise>
+			</c:choose>
+		</c:if>
 	
-					<aui:button-row>
-						<liferay-portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>" var="downloadProxy">
-						<portlet:param name="myaction" value="downloadCertificate" />
-						</liferay-portlet:renderURL>
-						<aui:button type="button" value="Get Credentials" onclick="$(this).modal({width:400, height:300, message:true, src: '${downloadProxy }'}).open(); return false;"/>	
+		<c:if test="${proxyDownloaded}">
+			
+			<c:set var="count" value="0" />
+			<table id="proxyTable">
+			
+	
+			<c:forTokens items="${proxys}"
+		                 delims="*"
+		                 var="currentName"
+		                 varStatus="status">
+		      
+		        <tr><td colspan="3"></td></tr>
+		        <c:out escapeXml="false" value="${currentName}"/>
+		        <c:set var="count" value="${status.count}" />
 				
-					</aui:button-row>
-				</aui:form>
-			</c:when>
-			<c:otherwise>
-				
-				<br/> 
-				
-				<div class="portlet-msg-error"> None VOs in use. Click the button below to retrieve your credentials.</div>
-				
-				<br/>
-				 
+		    </c:forTokens>
+		    </table>
+			<br/>
+			<%
+			out.println(renderRequest.getWindowState());
+			out.println(LiferayWindowState.POP_UP.toString());
+			%>
+			<c:if test="${(count) < voNumber}">
 				<aui:form name="catalogForm"
 						action="${downloadCertificateUrl}">
 						
-							<aui:button-row>
-									<liferay-portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>" var="downloadProxy">
-									<portlet:param name="myaction" value="downloadCertificate" />
-									</liferay-portlet:renderURL>
-									<aui:button type="button" value="Get Credentials" onclick="$(this).modal({width:400, height:300, message:true, src: '${downloadProxy }'}).open(); return false;"/>	
-				
-							</aui:button-row>
+					<aui:button-row>
+							<liferay-portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>" var="downloadProxy">
+							<portlet:param name="myaction" value="downloadCertificate" />
+							</liferay-portlet:renderURL>
+							<aui:button type="button" value="Get proxy for other VO" onclick="$(this).modal({width:400, height:300, message:true, src: '${downloadProxy }'}).open(); return false;"/>	
+					</aui:button-row>
 						
 				</aui:form>
-			</c:otherwise>
-		</c:choose>
-	</c:if>
-
-	<c:if test="${proxyDownloaded}">
-		
-		<c:set var="count" value="0" />
-		<table id="proxyTable">
-		
-
-		<c:forTokens items="${proxys}"
-	                 delims="*"
-	                 var="currentName"
-	                 varStatus="status">
-	      
-	        <tr><td colspan="3"></td></tr>
-	        <c:out escapeXml="false" value="${currentName}"/>
-	        <c:set var="count" value="${status.count}" />
-			
-	    </c:forTokens>
-	    </table>
-		<br/>
-		<c:if test="${(count) < voNumber}">
-			<aui:form name="catalogForm"
-					action="${downloadCertificateUrl}">
-					
-				<aui:button-row>
-						<liferay-portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>" var="downloadProxy">
-						<portlet:param name="myaction" value="downloadCertificate" />
-						</liferay-portlet:renderURL>
-						<aui:button type="button" value="Get proxy for other VO" onclick="$(this).modal({width:400, height:300, message:true, src: '${downloadProxy }'}).open(); return false;"/>	
-				</aui:button-row>
-					
-			</aui:form>
+			</c:if>
 		</c:if>
+		
+		
 	</c:if>
+	<div id="renewButton" style="display:none;">Renew proxy.</div>
+	<div id="settings" style="display:none;">User Settings.</div>
+	<div id="allOK" style="display:none;">All is OK.</div>
+	<div id="warning" style="display:none;">Your proxy will be expire,<br/> renew proxy.</div>
+	
+	</div>
 </c:if>
-<div id="renewButton" style="display:none;">Renew proxy.</div>
-<div id="settings" style="display:none;">User Settings.</div>
-<div id="allOK" style="display:none;">All is OK.</div>
-<div id="warning" style="display:none;">Your proxy will be expire,<br/> renew proxy.</div>
-
-</div>
+<c:if test="${aws==puws }">
+	<div id="containerLogin2"> 
+	
+	
+	
+	<aui:fieldset>
+			<div id="presentationLogin">
+				<aui:column columnWidth="70">
+					<div style="height: 28px; display:table-cell; vertical-align:bottom;">
+					Hi <strong><c:out
+							value="<%=((User) request.getAttribute(WebKeys.USER)).getFirstName() %>"></c:out>
+					</strong>
+					</div>
+				</aui:column>
+			</div>
+		</aui:fieldset>
+	<br/><br/><br/>
+	
+	
+	<div class="portlet-msg-success"> Proxy downloaded successfully<br/> Close this pop-up. </div>
+	
+	
+	</div>
+</c:if>

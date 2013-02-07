@@ -37,6 +37,7 @@ import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
 
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
@@ -94,7 +95,8 @@ public class LoginController {
 	}
 	
 	@RenderMapping(params = "myaction=success")
-	public String showSuccess(RenderResponse response) {
+	public String showSuccess(RenderResponse response, SessionStatus status) {
+		status.setComplete();
 		return "success";
 	}
 	
@@ -312,7 +314,7 @@ public class LoginController {
 							while ((line = output.readLine()) != null) {
 								log.info("[Stdout] " + line);
 								if(roles!=null){
-									if(line.contains("/gridit/Role=NULL")){
+									if(line.contains("/"+vo.getVo()+"/Role=NULL")){
 										tmpRole.add(role);
 										log.info("trovato: "+ role);
 									}
@@ -374,21 +376,21 @@ public class LoginController {
 							timeLeft = "<span style=\"color:red\"><strong>" + timeLeft + "</strong></span>";
 							button += "<div id=\"tooltipImg\"><a href=\"#warning\"><img src=\"" + request.getContextPath() + "/images/alert.png\" width=\"24\" height=\"24\" style=\"float: right; padding-right:10px;\"/></a></div>";
 						}else{
-							timeLeft = "<span style=\"color:#63AC68\"><strong>" + timeLeft + "</strong></span>";
+							timeLeft = "<span style=\"color:#1ea22a\"><strong>" + timeLeft + "</strong></span>";
 							button += "<div id=\"tooltipImg\"><a href=\"#allOK\"><img src=\"" + request.getContextPath() + "/images/NewCheck.png\" width=\"24\" height=\"24\" style=\"float: right; padding-right:10px;\"/></a></div>";
 						}
 						
 						
 						result += "<tr>" +
-									"<td colspan=\"3\" style=\"color: #000080\"><strong><u>VO: " + vo.getVo() + "</u></strong></td>" +
+									"<td colspan=\"3\" style=\"color: #4c4f50; padding-top: 10px; border-color:#4c4f50; border-style: solid; border-width: 0 0 1px 0;\"><strong>VO: " + vo.getVo() + "</strong></td>" +
 								  "</tr>" +
-								  "<tr>" +
-								    "<td style='width: 60px;'> <strong>Role:</strong>&nbsp&nbsp</td>" +
+								  "<tr style=\"border-color:#4c4f50; border-style: solid; border-width: 0 1px 0 1px; background-color: #afafaf;\">" +
+								    "<td style='width: 60px; padding-left: 5px;'> <strong>Role:</strong>&nbsp&nbsp</td>" +
 								    "<td> " + role + "&nbsp&nbsp</td>" +
-								    "<td style='width: 70px;'rowspan=\"2\" align=\"right\">" + button + "</td>"  +
+								    "<td style='width: 70px;  border-color:#4c4f50; border-style: solid; border-width: 0 0 1px 0;'rowspan=\"2\" align=\"right\">" + button + "</td>"  +
 								  "</tr>" +
-								  "<tr>" +
-								    "<td style='width: 60px;'> <strong>TimeLeft:</strong>&nbsp&nbsp</td>" +
+								  "<tr style=\"border-color:#4c4f50; border-style: solid; border-width: 0 1px 1px 1px; background-color: #afafaf;\">" +
+								    "<td style='width: 60px; padding-left: 5px;'> <strong>TimeLeft:</strong>&nbsp&nbsp</td>" +
 								    "<td>" + timeLeft + "</td>" +
 								  "</tr> *";
 					}
