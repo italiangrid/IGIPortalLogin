@@ -396,10 +396,6 @@
 		    </c:forTokens>
 		    </table>
 			<br/>
-			<%
-			out.println(renderRequest.getWindowState());
-			out.println(LiferayWindowState.POP_UP.toString());
-			%>
 			<c:if test="${(count) < voNumber}">
 				<aui:form name="catalogForm"
 						action="${downloadCertificateUrl}">
