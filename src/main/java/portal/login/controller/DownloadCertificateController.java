@@ -9,21 +9,12 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
-
-/*import portal.login.domain.UserInfo;
-import portal.login.domain.UserToVo;
-import portal.login.domain.Vo;
-import portal.login.services.UserInfoService;
-import portal.login.services.UserToVoService;*/
 
 import it.italiangrid.portal.dbapi.domain.UserInfo;
 import it.italiangrid.portal.dbapi.domain.UserToVo;

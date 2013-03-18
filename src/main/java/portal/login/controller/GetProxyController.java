@@ -147,7 +147,7 @@ public class GetProxyController {
 		User user = (User) request.getAttribute(WebKeys.USER);
 
 		String dir = System.getProperty("java.io.tmpdir");
-		log.error("Directory = " + dir);
+		log.debug("Directory = " + dir);
 
 		File location = new File(dir + "/users/" + user.getUserId() + "/");
 		if (!location.exists()) {
@@ -256,7 +256,7 @@ public class GetProxyController {
 			if(!n.getProxyExpireTime().equals("12:00"))
 				valid=n.getProxyExpireTime();
 			
-			log.error("Now Valid is: "+valid);
+			log.debug("Now Valid is: "+valid);
 			
 			boolean vomsproxyinit = myVomsProxyInit(proxyFileVO.toString(), selectedVo.getVo(), role, valid, request);
 
@@ -289,14 +289,6 @@ public class GetProxyController {
 				}
 				
 				response.setRenderParameter("myaction", "home");
-//				String completeurl = PortalUtil.getCurrentCompleteURL(PortalUtil.getHttpServletRequest(request));
-//				log.error(completeurl);
-//				
-//				String url = completeurl.substring(0, completeurl.indexOf("?"));
-//				
-//				log.error(url);
-//				
-//				response.sendRedirect(url);
 				
 			} else {
 				SessionErrors.add(request, "proxy-download-problem");
@@ -372,7 +364,7 @@ public class GetProxyController {
 			while ((line = brCleanUp.readLine()) != null) {
 				
 				if(!line.contains("....")){
-					log.error("[Stderr] " + line);
+					log.debug("[Stderr] " + line);
 					error= true;
 				}
 			}
