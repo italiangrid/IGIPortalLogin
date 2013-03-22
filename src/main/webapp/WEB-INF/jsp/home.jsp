@@ -381,7 +381,7 @@
 		<c:if test="${proxyDownloaded}">
 			
 			<c:set var="count" value="0" />
-			<table id="proxyTable">
+			<table id="proxyTable"  width="100%">
 			
 	
 			<c:forTokens items="${proxys}"
