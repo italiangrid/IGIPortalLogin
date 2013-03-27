@@ -356,7 +356,8 @@ public class LoginController {
 							e.printStackTrace();
 						}
 						
-						long totalSecs =cred.getTimeLeft();
+//						long totalSecs =cred.getTimeLeft();
+						long totalSecs = getExpirationTime(proxyVoFile.getAbsolutePath());
 						long hours = totalSecs / 3600;
 						long minutes = (totalSecs % 3600) / 60;
 						long seconds = totalSecs % 60;
@@ -400,4 +401,54 @@ public class LoginController {
 		return result;
 	}
 
+	private long getExpirationTime(String proxyFile) {
+
+		long result = 0;
+
+		try {
+			String cmd = "voms-proxy-info -actimeleft -file " + proxyFile;
+
+			log.error("cmd = " + cmd);
+			Process p = Runtime.getRuntime().exec(cmd);
+			InputStream stdout = p.getInputStream();
+			InputStream stderr = p.getErrorStream();
+
+			BufferedReader output = new BufferedReader(new InputStreamReader(
+					stdout));
+			String line = null;
+
+			long totalSecs=0;
+			
+			while ((line = output.readLine()) != null) {
+				log.info("[Stdout] " + line);
+				totalSecs = Long.parseLong(line);
+				
+//				long hours = totalSecs / 3600;
+//				long minutes = (totalSecs % 3600) / 60;
+//				long seconds = totalSecs % 60;
+//
+//				long[] newResult = { hours, minutes, seconds };
+				result = totalSecs;
+				
+			}
+
+			output.close();
+
+			BufferedReader brCleanUp = new BufferedReader(
+					new InputStreamReader(stderr));
+			while ((line = brCleanUp.readLine()) != null) {
+
+				log.error("[Stderr] " + line);
+			}
+
+			brCleanUp.close();
+
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
+
+		return result;
+	}
+	
 }
