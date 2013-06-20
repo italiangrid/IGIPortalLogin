@@ -9,7 +9,7 @@
 <%@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
 
-<%@ page import="portal.login.domain.Idp" %>
+<%@ page import="it.italiangrid.portal.dbapi.domain.Idp" %>
 
 
 
@@ -35,7 +35,9 @@
 <%@ page import="com.liferay.portal.service.permission.PortalPermissionUtil" %>
 <%@ page import="com.liferay.portal.service.permission.PortletPermissionUtil"%> 
 <%@ page import="com.liferay.portal.model.User"%>
+<%@ page import="com.liferay.portal.kernel.portlet.LiferayWindowState" %>
 <%@ page import="javax.portlet.PortletURL" %>
+
 
 <portlet:defineObjects />	
 <liferay-theme:defineObjects />

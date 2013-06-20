@@ -2,32 +2,48 @@ package portal.login.controller;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
+
+import javax.portlet.PortletConfig;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderResponse;
 import javax.portlet.RenderRequest;
-import portal.login.domain.Idp;
-import portal.login.domain.UserInfo;
-import portal.login.domain.UserToVo;
-import portal.login.domain.Vo;
-import portal.login.services.IdpService;
-import portal.login.services.UserInfoService;
-import portal.login.services.UserToVoService;
+import javax.portlet.WindowStateException;
+//import portal.login.domain.Idp;
+//import portal.login.domain.UserInfo;
+//import portal.login.domain.UserToVo;
+//import portal.login.domain.Vo;
+//import portal.login.services.IdpService;
+//import portal.login.services.UserInfoService;
+//import portal.login.services.UserToVoService;
+
+import it.italiangrid.portal.dbapi.domain.Idp;
+import it.italiangrid.portal.dbapi.domain.UserInfo;
+import it.italiangrid.portal.dbapi.domain.UserToVo;
+import it.italiangrid.portal.dbapi.domain.Vo;
+import it.italiangrid.portal.dbapi.services.IdpService;
+import it.italiangrid.portal.dbapi.services.UserInfoService;
+import it.italiangrid.portal.dbapi.services.UserToVoService;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
 
+import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
+import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.User;
 import org.globus.gsi.GlobusCredential;
@@ -46,8 +62,7 @@ import org.globus.gsi.GlobusCredentialException;
 public class LoginController {
 
 	/**
-	 * Logger of the class DownloadCertificateController. TODO to substitute it
-	 * with slf4j.
+	 * Logger of the class DownloadCertificateController. 
 	 */
 	private static final Logger log = Logger.getLogger(LoginController.class);
 
@@ -78,6 +93,17 @@ public class LoginController {
 	public String showLogin(RenderResponse response) {
 		return "home";
 	}
+	
+	@RenderMapping(params = "myaction=success")
+	public String showSuccess(RenderResponse response, SessionStatus status) {
+		status.setComplete();
+		return "success";
+	}
+	
+	@RenderMapping(params = "myaction=error")
+	public String showError(RenderResponse response) {
+		return "error";
+	}
 
 	/**
 	 * Present to the portlet a list of the IDP supported by the portal.
@@ -87,6 +113,50 @@ public class LoginController {
 	@ModelAttribute("idps")
 	public List<Idp> getIdps() {
 		return idpService.getAllIdp();
+	}
+	
+	@ModelAttribute("vaiqui")
+	public String getMydataUrl() {
+
+		/*
+		 * 1 prendi file
+		 * 2 leggi prop proxy.expiration.times
+		 * 3 parsa e metti in array
+		 */
+		
+		
+		//1
+		
+		String contextPath = LoginController.class.getClassLoader()
+				.getResource("").getPath();
+		
+		String result = "";
+
+		File test = new File(contextPath + "/content/MyProxy.properties");
+		if (test.exists()) {
+			
+			try {
+				FileInputStream inStream = new FileInputStream(contextPath
+						+ "/content/MyProxy.properties");
+
+				Properties prop = new Properties();
+
+				prop.load(inStream);
+
+				inStream.close();
+				
+				//2
+				result = prop.getProperty("mydata.url");
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		
+ 		
+		return result;
 	}
 
 	/**
@@ -102,48 +172,32 @@ public class LoginController {
 		if (user != null) {
 			String dir = System.getProperty("java.io.tmpdir");
 			log.info("Directory = " + dir);
+			
+			UserInfo userInfo = userInfoService.findByUsername(user.getScreenName());
+			List<Vo> vos = userToVoService.findVoByUserId(userInfo
+					.getUserId());
+			File proxyVoFile = null;
+			for (Iterator<Vo> iterator = vos.iterator(); iterator
+					.hasNext();) {
+				Vo vo = (Vo) iterator.next();
+				proxyVoFile = new File(dir + "/users/"
+						+ user.getUserId() + "/x509up."
+						+ vo.getVo());
 
-			File proxyFile = new File(dir + "/users/" + user.getUserId()
-					+ "/x509up");
-
-			if (proxyFile.exists()) {
-				try {
-					GlobusCredential cred = new GlobusCredential(
-							proxyFile.toString());
-					if (cred.getTimeLeft() > 0) {
-						return true;
-					} else {
-						UserInfo userInfo = userInfoService.findByUsername(user
-								.getScreenName());
-
-						File credFile = new File(dir + "/users/"
-								+ user.getUserId() + "/.creds");
-						File proxyVoFile = null;
-						credFile.delete();
-						proxyFile.delete();
-
-						List<Vo> vos = userToVoService.findVoByUserId(userInfo
-								.getUserId());
-						for (Iterator<Vo> iterator = vos.iterator(); iterator
-								.hasNext();) {
-							Vo vo = (Vo) iterator.next();
-							proxyVoFile = new File(dir + "/users/"
-									+ user.getUserId() + "/x509up."
-									+ vo.getVo());
-							if(proxyVoFile.exists()){
-								cred = new GlobusCredential(
-										proxyVoFile.toString());
-								if(cred.getTimeLeft() <= 0)
-									proxyVoFile.delete();
-							}
+				if (proxyVoFile.exists()&&vo.getConfigured().equals("true")) {
+					try {
+						GlobusCredential cred = new GlobusCredential(
+								proxyVoFile.toString());
+						if (cred.getTimeLeft() > 0) {
+							return true;
+						} else {
+							proxyVoFile.delete();
+							SessionMessages.add(request, "proxy-expired-deleted");
 						}
-
-						SessionMessages.add(request, "proxy-expired-deleted");
+					} catch (GlobusCredentialException e) {
+						e.printStackTrace();
+						log.info("e mò sono cazzi amari");
 					}
-				} catch (GlobusCredentialException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					log.info("e mò sono cazzi amari");
 				}
 			}
 
@@ -161,7 +215,13 @@ public class LoginController {
 			String username = user.getScreenName();
 
 			UserInfo userInfo = userInfoService.findByUsername(username);
-			return userToVoService.findVoByUserId(userInfo.getUserId()).size();
+			List<Vo> vos = userToVoService.findVoByUserId(userInfo.getUserId());
+			int count = 0;
+			for(Vo vo: vos){
+				if(vo.getConfigured().equals("true"))
+					count++;
+			}
+			return count;
 		}
 		return 0;
 	}
@@ -179,7 +239,9 @@ public class LoginController {
 			if(userToVoService.findVoByUserId(userInfo.getUserId()).size()==1){
 				List<UserToVo> utvs = userToVoService.findById(userInfo.getUserId());
 				UserToVo utv = utvs.get(0);
-				return utv.getFqans();
+				Vo vo = userToVoService.findVoByUserId(userInfo.getUserId()).get(0);
+				if(vo.getConfigured().equals("true"))
+					return utv.getFqans();
 			}
 		}
 		return null;
@@ -193,6 +255,10 @@ public class LoginController {
 	 */
 	@ModelAttribute("proxys")
 	public String getProxys(RenderRequest request, RenderResponse response) throws GlobusCredentialException {
+		
+		PortletConfig portletConfig = (PortletConfig)request.getAttribute(JavaConstants.JAVAX_PORTLET_CONFIG);
+		SessionMessages.add(request, portletConfig.getPortletName() + SessionMessages.KEY_SUFFIX_HIDE_DEFAULT_ERROR_MESSAGE);
+		
 		String result = "";
 		User user = (User)request.getAttribute(WebKeys.USER);
 		if(user!=null){
@@ -208,11 +274,11 @@ public class LoginController {
 						+ user.getUserId() + "/x509up."
 						+ vo.getVo());
 				
-				if(proxyVoFile.exists()){
+				if(proxyVoFile.exists()&&vo.getConfigured().equals("true")){
 					
-					GlobusCredential cred = new GlobusCredential(
-							proxyVoFile.toString());
-					if (cred.getTimeLeft() <= 0) {
+//					GlobusCredential cred = new GlobusCredential(
+//							proxyVoFile.toString());
+					if (getExpirationTime(proxyVoFile.getAbsolutePath()) <= 0) {
 						proxyVoFile.delete();
 						SessionMessages.add(request, "proxy-expired-deleted");
 					}else{
@@ -242,14 +308,13 @@ public class LoginController {
 									stdout));
 							String line = null;
 							
-							boolean check = true;
 							List<String> tmpRole = new ArrayList<String>();
 							
 							
 							while ((line = output.readLine()) != null) {
 								log.info("[Stdout] " + line);
 								if(roles!=null){
-									if(line.contains("/gridit/Role=NULL")){
+									if(line.contains("/"+vo.getVo()+"/Role=NULL")){
 										tmpRole.add(role);
 										log.info("trovato: "+ role);
 									}
@@ -286,37 +351,48 @@ public class LoginController {
 							
 
 						} catch (IOException e) {
+							
 							SessionErrors.add(request, "voms-proxy-init-exception");
 							e.printStackTrace();
 						}
 						
-						long totalSecs =cred.getTimeLeft();
+//						long totalSecs =cred.getTimeLeft();
+						long totalSecs = getExpirationTime(proxyVoFile.getAbsolutePath());
 						long hours = totalSecs / 3600;
 						long minutes = (totalSecs % 3600) / 60;
 						long seconds = totalSecs % 60;
-						
-						String timeLeft = hours + ":" + minutes +  ":" + seconds;
-						if(hours < 1)
-							timeLeft = "<span style=\"color:red\"><strong>" + timeLeft + "</strong></span>";
-						else
-							timeLeft = "<span style=\"color:#63AC68\"><strong>" + timeLeft + "</strong></span>";
-						
 						PortletURL url = response.createRenderURL();
 						url.setParameter("myaction", "showRenewProxy");
 						url.setParameter("idVo", Integer.toString(vo.getIdVo()));
-						String button = "<input type=\"submit\" value=\"Renew\" onClick=\"location.href=\'"+url+"\';\"></input>";
+						try {
+							url.setWindowState(LiferayWindowState.POP_UP);
+						} catch (WindowStateException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+//						String button = "<input type=\"submit\" value=\"Renew\" onClick=\"location.href=\'"+url+"\';\"></input>";
+						String button = "<div id=\"linkImg\"><a href=\""+url+"\" onmouseover=\"viewTooltip('#renewButton');\" onclick=\"$(this).modal({width:400, height:300, message:true}).open(); return false;\"><img src=\"" + request.getContextPath() + "/images/update.png\" width=\"24\" height=\"24\" style=\"float: right; padding-right:10px;\"/></a></div>";
+						String timeLeft = hours + ":" + minutes +  ":" + seconds;
+						if(hours < 1){
+							timeLeft = "<span style=\"color:red\"><strong>" + timeLeft + "</strong></span>";
+							button += "<div id=\"tooltipImg\"><a href=\"#warning\"><img src=\"" + request.getContextPath() + "/images/alert.png\" width=\"24\" height=\"24\" style=\"float: right; padding-right:10px;\"/></a></div>";
+						}else{
+							timeLeft = "<span style=\"color:#1ea22a\"><strong>" + timeLeft + "</strong></span>";
+							button += "<div id=\"tooltipImg\"><a href=\"#allOK\"><img src=\"" + request.getContextPath() + "/images/NewCheck.png\" width=\"24\" height=\"24\" style=\"float: right; padding-right:10px;\"/></a></div>";
+						}
+						
 						
 						result += "<tr>" +
-									"<td colspan=\"3\" style=\"color: #000080\" align=\"center\"><strong>VO: " + vo.getVo() + "</strong></td>" +
+									"<td colspan=\"3\" style=\"color: #4c4f50; padding-top: 10px; border-color:#4c4f50; border-style: solid; border-width: 0 0 1px 0;\"><strong>VO: " + vo.getVo() + "</strong></td>" +
 								  "</tr>" +
-								  "<tr>" +
-								    "<td> <strong>Role:</strong>&nbsp&nbsp</td>" +
-								    "<td> " + role + "&nbsp&nbsp</td>" +
-								    "<td rowspan=\"2\" align=\"right\">" + button + "</td>" +
+								  "<tr style=\"border-color:#4c4f50; border-style: solid; border-width: 0 1px 0 1px; background-color: #afafaf; cursor: pointer;\">" +
+								    "<td onclick=\"$('#shortDetails').show(); $('#details').hide();\" style='width: 60px; padding-left: 5px;'> <strong>Role:</strong>&nbsp&nbsp</td>" +
+								    "<td onclick=\"$('#shortDetails').show(); $('#details').hide();\"> " + role + "&nbsp&nbsp</td>" +
+								    "<td style='width: 70px;  border-color:#4c4f50; border-style: solid; border-width: 0 0 1px 0;'rowspan=\"2\" align=\"right\">" + button + "</td>"  +
 								  "</tr>" +
-								  "<tr>" +
-								    "<td> <strong>TimeLeft:</strong>&nbsp&nbsp</td>" +
-								    "<td>" + timeLeft + "</td>" +
+								  "<tr style=\"border-color:#4c4f50; border-style: solid; border-width: 0 1px 1px 1px; background-color: #afafaf; cursor: pointer;\">" +
+								    "<td onclick=\"$('#shortDetails').show(); $('#details').hide();\" style='width: 60px; padding-left: 5px;'> <strong>TimeLeft:</strong>&nbsp&nbsp</td>" +
+								    "<td onclick=\"$('#shortDetails').show(); $('#details').hide();\">" + timeLeft + "</td>" +
 								  "</tr> *";
 					}
 				}
@@ -325,4 +401,78 @@ public class LoginController {
 		return result;
 	}
 
+	private long getExpirationTime(String proxyFile) {
+
+		long result = 0;
+
+		try {
+			String cmd = "voms-proxy-info -actimeleft -file " + proxyFile;
+
+			log.info("cmd = " + cmd);
+			Process p = Runtime.getRuntime().exec(cmd);
+			InputStream stdout = p.getInputStream();
+			InputStream stderr = p.getErrorStream();
+
+			BufferedReader output = new BufferedReader(new InputStreamReader(
+					stdout));
+			String line = null;
+
+			long totalSecs=0;
+			
+			while ((line = output.readLine()) != null) {
+				log.info("[Stdout] " + line);
+				totalSecs = Long.parseLong(line);
+				
+//				long hours = totalSecs / 3600;
+//				long minutes = (totalSecs % 3600) / 60;
+//				long seconds = totalSecs % 60;
+//
+//				long[] newResult = { hours, minutes, seconds };
+				result = totalSecs;
+				
+			}
+
+			output.close();
+
+			BufferedReader brCleanUp = new BufferedReader(
+					new InputStreamReader(stderr));
+			while ((line = brCleanUp.readLine()) != null) {
+
+				log.error("[Stderr] " + line);
+			}
+
+			brCleanUp.close();
+
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
+
+		return result;
+	}
+	
+	@ModelAttribute("shortProxies")
+	public List<String> shortProxies(RenderRequest request){
+		User user = (User)request.getAttribute(WebKeys.USER);
+		
+		List<String> result = new ArrayList<String>();
+		if(user!=null){
+			String dir = System.getProperty("java.io.tmpdir");
+			dir += "/users/"+user.getUserId()+"/";
+			
+			String proxyPrefix = dir + "x509up.";
+			
+			UserInfo userInfo = userInfoService.findByMail(user.getEmailAddress());
+			List<Vo> vos = userToVoService.findVoByUserId(userInfo.getUserId());
+			
+			for(Vo vo: vos){
+				File proxy = new File(proxyPrefix+vo.getVo());
+				
+				if(proxy.exists())
+					result.add(vo.getVo());
+			}
+			
+		}
+		return result;
+	}
 }

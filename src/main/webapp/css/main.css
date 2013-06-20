@@ -1,0 +1,34 @@
+#tooltip {
+	position: absolute;
+	z-index: 3000;
+	border: 1px solid #111;
+	background-color: #eee;
+	padding: 5px;
+	opacity: 0.85;
+}
+#tooltip h3, #tooltip div { margin: 0; }
+
+#containerLogin {
+	background-color: #e4e4e4;
+	box-shadow: 10px 10px 5px #888;
+	border: 1px;
+	border-style: solid;
+	border-color: #c1c1c1;
+	border-radius: 5px;
+	padding: 10px 5px 5px 10px;
+	margin-right: 9px;
+}
+
+#presentationLogin {
+	color: black;
+	font-size:120%;
+	font-weight: bold;
+	border-bottom: 1px solid #CCC;
+	display: block;
+	position: absolute;
+	width: 90%;
+}
+
+#proxyTable{
+	width: 100%;
+}

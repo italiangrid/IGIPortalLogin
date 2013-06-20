@@ -20,4 +20,9 @@
 		<servlet-name>view-servlet</servlet-name>
 		<url-pattern>/WEB-INF/servlet/view</url-pattern>
 	</servlet-mapping>
+	
+	<listener>
+		<listener-class>portal.login.server.NotificationCenter</listener-class>
+	</listener>
+	
 </web-app>

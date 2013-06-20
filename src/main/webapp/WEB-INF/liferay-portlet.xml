@@ -7,6 +7,9 @@
 		<instanceable>true</instanceable>
 		<header-portlet-css>/css/main.css</header-portlet-css>
 		<header-portal-javascript>/Login-1.1/js/jquery-1.6.1.min.js</header-portal-javascript>
+		<header-portal-javascript>/Login-1.1/js/jquery-ui.min.js</header-portal-javascript>
+		<footer-portal-javascript>/Login-1.1/js/jquery.tooltip.js</footer-portal-javascript>
+		<footer-portal-javascript>/Login-1.1/js/main.js</footer-portal-javascript>
 	</portlet>
 	<role-mapper>
 		<role-name>administrator</role-name>

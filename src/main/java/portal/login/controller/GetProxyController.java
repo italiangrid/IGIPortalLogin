@@ -18,6 +18,7 @@ import java.util.Properties;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
+import javax.portlet.PortletConfig;
 
 import org.apache.log4j.Logger;
 import org.globus.gsi.GlobusCredential;
@@ -31,16 +32,29 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.bind.annotation.ActionMapping;
 
-import portal.login.domain.Certificate;
+import portal.login.util.LoadProperties;
+
+/*import portal.login.domain.Certificate;
 import portal.login.domain.UserInfo;
 import portal.login.domain.Vo;
 import portal.login.services.CertificateService;
 import portal.login.services.UserInfoService;
 import portal.login.services.UserToVoService;
-import portal.login.services.VoService;
+import portal.login.services.VoService;*/
+
+import it.italiangrid.portal.dbapi.domain.Certificate;
+import it.italiangrid.portal.dbapi.domain.Notify;
+import it.italiangrid.portal.dbapi.domain.UserInfo;
+import it.italiangrid.portal.dbapi.domain.Vo;
+import it.italiangrid.portal.dbapi.services.CertificateService;
+import it.italiangrid.portal.dbapi.services.NotifyService;
+import it.italiangrid.portal.dbapi.services.UserInfoService;
+import it.italiangrid.portal.dbapi.services.UserToVoService;
+import it.italiangrid.portal.dbapi.services.VoService;
 
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
+import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.User;
 
@@ -68,6 +82,12 @@ public class GetProxyController {
 	 */
 	@Autowired
 	private UserInfoService userInfoService;
+	
+	/**
+	 * Attribute for access to the PortalUser database.
+	 */
+	@Autowired
+	private NotifyService notifyService;
 
 	/**
 	 * Attribute for access to the PortalUser database.
@@ -100,13 +120,14 @@ public class GetProxyController {
 	@ActionMapping(params = "myaction=getProxy")
 	public void getProxy(ActionRequest request, ActionResponse response)
 			throws IOException, CertificateEncodingException {
-		log.info("***** Pronto per scaricare il proxy *****");
+		log.debug("***** Pronto per scaricare il proxy *****");
 		
-		
+		PortletConfig portletConfig = (PortletConfig)request.getAttribute(JavaConstants.JAVAX_PORTLET_CONFIG);
+		SessionMessages.add(request, portletConfig.getPortletName() + SessionMessages.KEY_SUFFIX_HIDE_DEFAULT_ERROR_MESSAGE);
 		
 		String contextPath = GetProxyController.class.getClassLoader().getResource("").getPath();
 		
-		log.info("dove sono:" + contextPath);
+		log.debug("dove sono:" + contextPath);
 		
 		FileInputStream inStream =
 	    new FileInputStream(contextPath + "/content/MyProxy.properties");
@@ -115,17 +136,19 @@ public class GetProxyController {
 		prop.load(inStream);
 		inStream.close();
 		
-		String host = prop.getProperty("host");
+		String host = prop.getProperty("myproxy.storage");
+		String hostGrid = prop.getProperty("myproxy.grid");
 		String valid = prop.getProperty("valid");
+		String cloudVo= prop.getProperty("cloud.vo");
 		
-		log.info("Host = " + host);
-		log.info("Valid = " + valid);
+		log.debug("Host = " + host);
+		log.debug("Valid = " + valid);
 
 		MyProxy mp = new MyProxy(host, 7512);
 		User user = (User) request.getAttribute(WebKeys.USER);
 
 		String dir = System.getProperty("java.io.tmpdir");
-		log.info("Directory = " + dir);
+		log.error("Directory = " + dir);
 
 		File location = new File(dir + "/users/" + user.getUserId() + "/");
 		if (!location.exists()) {
@@ -134,16 +157,33 @@ public class GetProxyController {
 
 		OutputStream out = null;
 
-		//int cert = Integer.parseInt(request.getParameter("certsId"));
 		int vo = Integer.parseInt(request.getParameter("vosId"));
 		String pass = (String) request.getParameter("proxyPass");
 		String role = (String) request.getParameter("fqan");
 		
-		log.info("role = " + role);
+		if(role==null)
+			role="norole";
+		log.debug(" ");
+		log.debug("################################");
+		log.debug("#");
+		log.debug("# vo = " + vo);
+		log.debug("# role = " + role);
+		log.debug("#");
+		log.debug("################################");
+		log.debug(" ");
 
 		String username = user.getScreenName();
 
 		UserInfo userInfo = userInfoService.findByUsername(username);
+		
+		Notify n = notifyService.findByUserInfo(userInfo);
+		
+		if(n==null){
+			notifyService.save(new Notify(userInfo, "false"));
+			n = notifyService.findByUserInfo(userInfo);
+		}
+		
+		
 		Vo selectedVo =null;
 		if(vo == 0){
 			String tmp = userToVoService.findDefaultVo(userInfo.getUserId());
@@ -166,28 +206,36 @@ public class GetProxyController {
 
 		File proxyFile = new File(dir + "/users/" + user.getUserId()
 				+ "/x509up");
-		/*File myproxyFile = new File(dir + "/users/" + user.getUserId()
-				+ "/x509uplong");*/
 		File proxyFileVO = new File(dir + "/users/" + user.getUserId()
 				+ "/x509up." + selectedVo.getVo());
 		
+		log.debug(" ");
+		log.debug("################################");
+		log.debug("#");
+		log.debug("# selectedVo = " + selectedVo.getVo());
+		log.debug("#");
+		log.debug("################################");
+		log.debug(" ");
+		
 
 		try {
-
-			log.info("certificato: " + cert.getUsernameCert() + " password: "
+			String usernameCert = cert.getUsernameCert();
+			if(selectedVo.getVo().equals(cloudVo)){
+				usernameCert+="_rfc";
+			}
+			log.debug("certificato: " + usernameCert + " password: "
 					+ pass);
-			GSSCredential proxy = mp.get(cert.getUsernameCert(), pass, 608400);
-					//100 * 3600);
-			//GSSCredential myproxy = mp.get(cert.getUsernameCert(), pass, 608400);
-			log.info("----- All ok -----");
-			log.info("Proxy:" + proxy.toString());
+			GSSCredential proxy = mp.get(usernameCert, pass, 608400);
+			
+			log.debug("----- All ok -----");
+			log.debug("Proxy:" + proxy.toString());
 
 			GlobusCredential globusCred = null;
 			globusCred = ((GlobusGSSCredentialImpl) proxy)
 					.getGlobusCredential();
-			log.info("----- Passo per il istanceof GlobusGSSCredentialImpl");
+			log.debug("----- Passo per il istanceof GlobusGSSCredentialImpl");
 
-			log.info("Save proxy file: " + globusCred);
+			log.debug("Save proxy file: " + globusCred);
 			out = new FileOutputStream(proxyFile);
 			Util.setFilePermissions(proxyFile.toString(), 600);
 			globusCred.save(out);
@@ -199,7 +247,7 @@ public class GetProxyController {
 			Util.setFilePermissions(myproxyFile.toString(), 600);
 			myproxyCred.save(out);*/
 			
-			myMyProxyInit(proxyFile.toString(), host, cert.getSubject(), pass, request);
+			boolean proxyinit = myMyProxyInit(proxyFile.toString(), hostGrid, cert.getSubject(), pass, request);
 			
 			//myproxyFile.delete();
 			
@@ -209,7 +257,12 @@ public class GetProxyController {
 			Util.setFilePermissions(proxyFileVO.toString(), 600);
 			globusCred.save(out);
 			
-			myVomsProxyInit(proxyFileVO.toString(), selectedVo.getVo(), role, valid, request);
+			if(!n.getProxyExpireTime().equals("12:00"))
+				valid=n.getProxyExpireTime();
+			
+			log.error("Now Valid is: "+valid);
+			
+			boolean vomsproxyinit = myVomsProxyInit(proxyFileVO.toString(), selectedVo.getVo(), role, valid, request);
 
 
 			FileWriter fstream = new FileWriter(dir + "/users/"
@@ -220,22 +273,59 @@ public class GetProxyController {
 					+ "; ;#" + selectedVo.getVo() + " ;\n");
 			// Close the output stream
 			outcred.close();
-
-			SessionMessages.add(request, "proxy-download-success");
+			
+			if(proxyinit&&vomsproxyinit){
+				SessionMessages.add(request, "proxy-download-success");
+				
+				log.debug("@@@@ TEST @@@@");
+				
+				log.debug("@@@@" + n.getProxyExpire());
+				log.debug("@@@@ TEST @@@@");
+				
+				LoadProperties props = new LoadProperties("checkProxy.properties");
+				if(n.getProxyExpire().equals("true")){
+					log.debug("è richiesta la notifica");
+					
+					props.putValue(n.getIdNotify()+"."+selectedVo.getVo(), proxyFileVO.toString()+";"+60+";"+userInfo.getMail()+";"+userInfo.getFirstName()+";"+valid+";"+role);
+				}else{
+					log.debug("non è richiesta la notifica");
+					props.deleteValue(n.getIdNotify()+"."+selectedVo.getVo());
+				}
+				
+				response.setRenderParameter("myaction", "home");
+//				String completeurl = PortalUtil.getCurrentCompleteURL(PortalUtil.getHttpServletRequest(request));
+//				log.error(completeurl);
+//				
+//				String url = completeurl.substring(0, completeurl.indexOf("?"));
+//				
+//				log.error(url);
+//				
+//				response.sendRedirect(url);
+				
+			} else {
+				SessionErrors.add(request, "proxy-download-problem");
+				response.setRenderParameter("myaction", "showRenewProxy");
+				response.setRenderParameter("idVo", String.valueOf(selectedVo.getIdVo()));
+			}
 
 		} catch (MyProxyException e) {
 			//e.printStackTrace();
+			
 			SessionErrors.add(request, "proxy-download-problem");
 			log.error("***** errore myproxy " + e.getMessage()
 					+ " MyProxyException *****");
-			response.setRenderParameter("myaction", "idps");
+			response.setRenderParameter("myaction", "showRenewProxy");
+			response.setRenderParameter("idVo", String.valueOf(selectedVo.getIdVo()));
 
 		} catch (IllegalArgumentException e) {
+			
 			SessionErrors.add(request, "proxy-download-problem");
 			log.error("***** errore myproxy IllegalArgumentException *****");
-			response.setRenderParameter("myaction", "idps");
+			response.setRenderParameter("myaction", "showRenewProxy");
+			response.setRenderParameter("idVo", String.valueOf(selectedVo.getIdVo()));
 
 		} catch (FileNotFoundException e) {
+			
 			log.error("Could not write credential to file "
 					+ proxyFile.getAbsolutePath() + ": " + e.getMessage());
 			throw new IOException(e.getMessage());
@@ -245,6 +335,7 @@ public class GetProxyController {
 				try {
 					out.close();
 				} catch (IOException e) {
+					
 					log.error("Could not write credential to file "
 							+ proxyFile.getAbsolutePath() + ": "
 							+ e.getMessage());
@@ -259,7 +350,7 @@ public class GetProxyController {
 		String[] commands = new String[]{"/usr/bin/myproxy-init", "-n", "-d", "-s", host, "-C", proxyFile, "-y", proxyFile};
 
 		for (int i = 0; i < commands.length; i++) {
-			log.info("cmd = "+ commands[i]);
+			log.debug("cmd = "+ commands[i]);
 		}
 		
 		Process p;
@@ -274,7 +365,7 @@ public class GetProxyController {
 			String line = null;
 
 			while ((line = output.readLine()) != null) {
-				log.info("[Stdout] " + line);
+				log.debug("[Stdout] " + line);
 			}
 			output.close();
 			
@@ -297,6 +388,7 @@ public class GetProxyController {
 		
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
+			
 			SessionErrors.add(request, "myMyProxyInit-exception");
 			e.printStackTrace();
 			return false;
@@ -307,19 +399,36 @@ public class GetProxyController {
 	private boolean myVomsProxyInit(String proxyFile, String voms, String role, String valid, ActionRequest request){
 		try {
 			
+			String contextPath = GetProxyController.class.getClassLoader().getResource("").getPath();
+			
+			log.debug("dove sono:" + contextPath);
+			
+			FileInputStream inStream =
+		    new FileInputStream(contextPath + "/content/MyProxy.properties");
+
+			Properties prop = new Properties();
+			prop.load(inStream);
+			inStream.close();
+			
+			String cloudVo = prop.getProperty("cloud.vo");
+			
 			User user = (User) request.getAttribute(WebKeys.USER);
 
 			String dir = System.getProperty("java.io.tmpdir");
-			log.info("Directory = " + dir);
+			log.debug("Directory = " + dir);
 
 			String proxy = dir + "/users/" + user.getUserId() + "/x509up";
 			
 			String cmd = "voms-proxy-init -noregen -cert " + proxy + " -key " + proxy + " -out " + proxyFile + " -valid " + valid  + " -voms " + voms;
-			log.info(cmd);
+			
+			log.debug(cmd);
 			if(!role.equals("norole")){
 				cmd += ":" + role;
 			}
-			log.info("cmd = " + cmd);
+			
+			if(voms.equals(cloudVo))
+				cmd += " -rfc";
+			log.error("cmd = " + cmd);
 			Process p = Runtime.getRuntime().exec(cmd);
 			InputStream stdout = p.getInputStream();
 			InputStream stderr = p.getErrorStream();
@@ -329,7 +438,7 @@ public class GetProxyController {
 			String line = null;
 
 			while ((line = output.readLine()) != null) {
-				log.info("[Stdout] " + line);
+				log.debug("[Stdout] " + line);
 			}
 			output.close();
 			
@@ -350,6 +459,7 @@ public class GetProxyController {
 			return true;
 
 		} catch (IOException e) {
+			
 			SessionErrors.add(request, "voms-proxy-init-exception");
 			e.printStackTrace();
 			return false;
@@ -367,7 +477,7 @@ public class GetProxyController {
 		User user = (User) request.getAttribute(WebKeys.USER);
 
 		String dir = System.getProperty("java.io.tmpdir");
-		log.info("Directory = " + dir);
+		log.debug("Directory = " + dir);
 
 		UserInfo userInfo = userInfoService
 				.findByUsername(user.getScreenName());

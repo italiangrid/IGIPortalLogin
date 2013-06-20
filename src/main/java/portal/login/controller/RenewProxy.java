@@ -1,5 +1,10 @@
 package portal.login.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
+
 import javax.portlet.RenderRequest;
 
 import org.apache.log4j.Logger;
@@ -13,12 +18,19 @@ import org.springframework.web.portlet.bind.annotation.RenderMapping;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.User;
 
-import portal.login.domain.UserInfo;
-import portal.login.domain.UserToVo;
-import portal.login.domain.Vo;
-import portal.login.services.UserInfoService;
-import portal.login.services.UserToVoService;
-import portal.login.services.VoService;
+//import portal.login.domain.UserInfo;
+//import portal.login.domain.UserToVo;
+//import portal.login.domain.Vo;
+//import portal.login.services.UserInfoService;
+//import portal.login.services.UserToVoService;
+//import portal.login.services.VoService;
+
+import it.italiangrid.portal.dbapi.domain.UserInfo;
+import it.italiangrid.portal.dbapi.domain.UserToVo;
+import it.italiangrid.portal.dbapi.domain.Vo;
+import it.italiangrid.portal.dbapi.services.UserInfoService;
+import it.italiangrid.portal.dbapi.services.UserToVoService;
+import it.italiangrid.portal.dbapi.services.VoService;
 
 @Controller(value = "renewProxyController")
 @RequestMapping(value = "VIEW")
@@ -84,6 +96,50 @@ public class RenewProxy {
 		UserToVo utv = userToVoService.findById(userInfo.getUserId(), idVo);
 		
 		return utv.getFqans();
+	}
+	
+	@ModelAttribute("vaiqui")
+	public String getMydataUrl() {
+
+		/*
+		 * 1 prendi file
+		 * 2 leggi prop proxy.expiration.times
+		 * 3 parsa e metti in array
+		 */
+		
+		
+		//1
+		
+		String contextPath = LoginController.class.getClassLoader()
+				.getResource("").getPath();
+		
+		String result = "";
+
+		File test = new File(contextPath + "/content/MyProxy.properties");
+		if (test.exists()) {
+			
+			try {
+				FileInputStream inStream = new FileInputStream(contextPath
+						+ "/content/MyProxy.properties");
+
+				Properties prop = new Properties();
+
+				prop.load(inStream);
+
+				inStream.close();
+				
+				//2
+				result = prop.getProperty("mydata.url");
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		
+ 		
+		return result;
 	}
 
 }
