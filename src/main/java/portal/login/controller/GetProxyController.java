@@ -139,6 +139,7 @@ public class GetProxyController {
 		String host = prop.getProperty("myproxy.storage");
 		String hostGrid = prop.getProperty("myproxy.grid");
 		String valid = prop.getProperty("valid");
+		String cloudVo= prop.getProperty("cloud.vo");
 		
 		log.debug("Host = " + host);
 		log.debug("Valid = " + valid);
@@ -218,10 +219,13 @@ public class GetProxyController {
 		
 
 		try {
-
-			log.debug("certificato: " + cert.getUsernameCert() + " password: "
+			String usernameCert = cert.getUsernameCert();
+			if(selectedVo.getVo().equals(cloudVo)){
+				usernameCert+="_rfc";
+			}
+			log.debug("certificato: " + usernameCert + " password: "
 					+ pass);
-			GSSCredential proxy = mp.get(cert.getUsernameCert(), pass, 608400);
+			GSSCredential proxy = mp.get(usernameCert, pass, 608400);
 			
 			log.debug("----- All ok -----");
 			log.debug("Proxy:" + proxy.toString());
@@ -395,6 +399,19 @@ public class GetProxyController {
 	private boolean myVomsProxyInit(String proxyFile, String voms, String role, String valid, ActionRequest request){
 		try {
 			
+			String contextPath = GetProxyController.class.getClassLoader().getResource("").getPath();
+			
+			log.debug("dove sono:" + contextPath);
+			
+			FileInputStream inStream =
+		    new FileInputStream(contextPath + "/content/MyProxy.properties");
+
+			Properties prop = new Properties();
+			prop.load(inStream);
+			inStream.close();
+			
+			String cloudVo = prop.getProperty("cloud.vo");
+			
 			User user = (User) request.getAttribute(WebKeys.USER);
 
 			String dir = System.getProperty("java.io.tmpdir");
@@ -403,11 +420,15 @@ public class GetProxyController {
 			String proxy = dir + "/users/" + user.getUserId() + "/x509up";
 			
 			String cmd = "voms-proxy-init -noregen -cert " + proxy + " -key " + proxy + " -out " + proxyFile + " -valid " + valid  + " -voms " + voms;
+			
 			log.debug(cmd);
 			if(!role.equals("norole")){
 				cmd += ":" + role;
 			}
-			log.debug("cmd = " + cmd);
+			
+			if(voms.equals(cloudVo))
+				cmd += " -rfc";
+			log.error("cmd = " + cmd);
 			Process p = Runtime.getRuntime().exec(cmd);
 			InputStream stdout = p.getInputStream();
 			InputStream stderr = p.getErrorStream();

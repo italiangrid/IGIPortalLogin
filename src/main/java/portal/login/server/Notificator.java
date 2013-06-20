@@ -60,20 +60,17 @@ public class Notificator implements Runnable {
 							switch (limit) {
 							case 60:
 								String newValid = expirationTime[3] +":"+expirationTime[4];
-								
-								if(expirationTime[3]>1){
-									if (tryToRenewProxy(proxyFile, voName, newValid,
-											role)) {
-										break;
-									}
+								boolean renewed = false;
+								if((expirationTime[3]>1)&&(tryToRenewProxy(proxyFile, voName, newValid, role))) {
+									renewed=true;
+									log.info("Authomatic renewed.");
 								}
-								props.putValue(key,
-										value.replace("60", "30"));
-
-								log.info("60  minutes limit");
 								
-								sendMail(mail, user, limit, voName);
-								
+								if(!renewed){
+									props.putValue(key,value.replace("60", "30"));
+									log.info("60  minutes limit");
+									sendMail(mail, user, limit, voName);
+								}
 								break;
 							case 30:
 								props.deleteValue(key);
@@ -205,23 +202,27 @@ public class Notificator implements Runnable {
 			}
 			output.close();
 
-			boolean error = false;
+//			boolean error = false;
 
 			BufferedReader brCleanUp = new BufferedReader(
 					new InputStreamReader(stderr));
 			while ((line = brCleanUp.readLine()) != null) {
 				
 				if (!line.contains("....")) {
-					error = true;
+					//error = true;
 					log.error("[Stderr] " + line);
 				}
 			}
 
 			brCleanUp.close();
-			if (error == true)
-				return false;
+//			if (error == true)
+//				return false;
+			long[] expirationTime = getExpirationTime(proxyFile,valid);
 			
-			return true;
+			if(expirationTime[3]>1)
+				return true;
+			
+			return false;
 
 		} catch (IOException e) {
 

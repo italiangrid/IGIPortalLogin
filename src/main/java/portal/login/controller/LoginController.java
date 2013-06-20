@@ -276,9 +276,9 @@ public class LoginController {
 				
 				if(proxyVoFile.exists()&&vo.getConfigured().equals("true")){
 					
-					GlobusCredential cred = new GlobusCredential(
-							proxyVoFile.toString());
-					if (cred.getTimeLeft() <= 0) {
+//					GlobusCredential cred = new GlobusCredential(
+//							proxyVoFile.toString());
+					if (getExpirationTime(proxyVoFile.getAbsolutePath()) <= 0) {
 						proxyVoFile.delete();
 						SessionMessages.add(request, "proxy-expired-deleted");
 					}else{
@@ -385,14 +385,14 @@ public class LoginController {
 						result += "<tr>" +
 									"<td colspan=\"3\" style=\"color: #4c4f50; padding-top: 10px; border-color:#4c4f50; border-style: solid; border-width: 0 0 1px 0;\"><strong>VO: " + vo.getVo() + "</strong></td>" +
 								  "</tr>" +
-								  "<tr style=\"border-color:#4c4f50; border-style: solid; border-width: 0 1px 0 1px; background-color: #afafaf;\">" +
-								    "<td style='width: 60px; padding-left: 5px;'> <strong>Role:</strong>&nbsp&nbsp</td>" +
-								    "<td> " + role + "&nbsp&nbsp</td>" +
+								  "<tr style=\"border-color:#4c4f50; border-style: solid; border-width: 0 1px 0 1px; background-color: #afafaf; cursor: pointer;\">" +
+								    "<td onclick=\"$('#shortDetails').show(); $('#details').hide();\" style='width: 60px; padding-left: 5px;'> <strong>Role:</strong>&nbsp&nbsp</td>" +
+								    "<td onclick=\"$('#shortDetails').show(); $('#details').hide();\"> " + role + "&nbsp&nbsp</td>" +
 								    "<td style='width: 70px;  border-color:#4c4f50; border-style: solid; border-width: 0 0 1px 0;'rowspan=\"2\" align=\"right\">" + button + "</td>"  +
 								  "</tr>" +
-								  "<tr style=\"border-color:#4c4f50; border-style: solid; border-width: 0 1px 1px 1px; background-color: #afafaf;\">" +
-								    "<td style='width: 60px; padding-left: 5px;'> <strong>TimeLeft:</strong>&nbsp&nbsp</td>" +
-								    "<td>" + timeLeft + "</td>" +
+								  "<tr style=\"border-color:#4c4f50; border-style: solid; border-width: 0 1px 1px 1px; background-color: #afafaf; cursor: pointer;\">" +
+								    "<td onclick=\"$('#shortDetails').show(); $('#details').hide();\" style='width: 60px; padding-left: 5px;'> <strong>TimeLeft:</strong>&nbsp&nbsp</td>" +
+								    "<td onclick=\"$('#shortDetails').show(); $('#details').hide();\">" + timeLeft + "</td>" +
 								  "</tr> *";
 					}
 				}
@@ -408,7 +408,7 @@ public class LoginController {
 		try {
 			String cmd = "voms-proxy-info -actimeleft -file " + proxyFile;
 
-			log.error("cmd = " + cmd);
+			log.info("cmd = " + cmd);
 			Process p = Runtime.getRuntime().exec(cmd);
 			InputStream stdout = p.getInputStream();
 			InputStream stderr = p.getErrorStream();
@@ -451,4 +451,28 @@ public class LoginController {
 		return result;
 	}
 	
+	@ModelAttribute("shortProxies")
+	public List<String> shortProxies(RenderRequest request){
+		User user = (User)request.getAttribute(WebKeys.USER);
+		
+		List<String> result = new ArrayList<String>();
+		if(user!=null){
+			String dir = System.getProperty("java.io.tmpdir");
+			dir += "/users/"+user.getUserId()+"/";
+			
+			String proxyPrefix = dir + "x509up.";
+			
+			UserInfo userInfo = userInfoService.findByMail(user.getEmailAddress());
+			List<Vo> vos = userToVoService.findVoByUserId(userInfo.getUserId());
+			
+			for(Vo vo: vos){
+				File proxy = new File(proxyPrefix+vo.getVo());
+				
+				if(proxy.exists())
+					result.add(vo.getVo());
+			}
+			
+		}
+		return result;
+	}
 }
