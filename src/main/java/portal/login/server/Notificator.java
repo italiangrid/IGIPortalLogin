@@ -39,7 +39,7 @@ public class Notificator implements Runnable {
 				String valid = value.split(";")[4];
 				String role = value.split(";")[5];
 
-				String voName = key.split("\\.")[1];
+				String voName = key.substring(key.indexOf(".")+1, key.length());
 
 				log.debug("RESULT: " + proxyFile + " | " + limit + " | "
 						+ voName + " | " + mail + " | " + user + " | " + valid
