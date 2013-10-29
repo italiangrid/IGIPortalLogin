@@ -100,6 +100,12 @@ public class LoginController {
 		return "success";
 	}
 	
+	@RenderMapping(params = "myaction=successDM")
+	public String showSuccessDM(RenderResponse response, SessionStatus status) {
+		status.setComplete();
+		return "successDM";
+	}
+	
 	@RenderMapping(params = "myaction=error")
 	public String showError(RenderResponse response) {
 		return "error";

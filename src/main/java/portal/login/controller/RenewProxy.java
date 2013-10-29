@@ -72,6 +72,16 @@ public class RenewProxy {
 	}
 	
 	/**
+	 * Method for render downloadCertificate.jsp page.
+	 * 
+	 * @return the page file name.
+	 */
+	@RenderMapping(params = "myaction=showRenewProxyDM")
+	public String showDownloadCertificateDM() {
+		return "renewProxyDM";
+	}
+	
+	/**
 	 * Return to the portlet the list of the user's vo membership
 	 * @param request: session parameter
 	 * @return the list of the user's vo membership

@@ -161,6 +161,8 @@ public class GetProxyController {
 		String pass = (String) request.getParameter("proxyPass");
 		String role = (String) request.getParameter("fqan");
 		
+		String isDM = (String) request.getParameter("isDM");
+		
 		if(role==null)
 			role="norole";
 		log.debug(" ");
@@ -292,7 +294,13 @@ public class GetProxyController {
 					props.deleteValue(n.getIdNotify()+"."+selectedVo.getVo());
 				}
 				
-				response.setRenderParameter("myaction", "home");
+				
+				
+				if(isDM.equals("true")){
+					response.setRenderParameter("myaction", "successDM");
+				}else{
+					response.setRenderParameter("myaction", "home");
+				}
 //				String completeurl = PortalUtil.getCurrentCompleteURL(PortalUtil.getHttpServletRequest(request));
 //				log.error(completeurl);
 //				
@@ -304,7 +312,11 @@ public class GetProxyController {
 				
 			} else {
 				SessionErrors.add(request, "proxy-download-problem");
-				response.setRenderParameter("myaction", "showRenewProxy");
+				if(isDM.equals("true")){
+					response.setRenderParameter("myaction", "showRenewProxyDM");
+				}else{
+					response.setRenderParameter("myaction", "showRenewProxy");
+				}
 				response.setRenderParameter("idVo", String.valueOf(selectedVo.getIdVo()));
 			}
 
@@ -314,14 +326,22 @@ public class GetProxyController {
 			SessionErrors.add(request, "proxy-download-problem");
 			log.error("***** errore myproxy " + e.getMessage()
 					+ " MyProxyException *****");
-			response.setRenderParameter("myaction", "showRenewProxy");
+			if(isDM.equals("true")){
+				response.setRenderParameter("myaction", "showRenewProxyDM");
+			}else{
+				response.setRenderParameter("myaction", "showRenewProxy");
+			}
 			response.setRenderParameter("idVo", String.valueOf(selectedVo.getIdVo()));
 
 		} catch (IllegalArgumentException e) {
 			
 			SessionErrors.add(request, "proxy-download-problem");
 			log.error("***** errore myproxy IllegalArgumentException *****");
-			response.setRenderParameter("myaction", "showRenewProxy");
+			if(isDM.equals("true")){
+				response.setRenderParameter("myaction", "showRenewProxyDM");
+			}else{
+				response.setRenderParameter("myaction", "showRenewProxy");
+			}
 			response.setRenderParameter("idVo", String.valueOf(selectedVo.getIdVo()));
 
 		} catch (FileNotFoundException e) {

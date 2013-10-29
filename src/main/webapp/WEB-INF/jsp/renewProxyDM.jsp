@@ -10,35 +10,20 @@
 	<portlet:param name="myaction" value="idps" />
 </portlet:renderURL>
 
-<aui:fieldset>
-		<div id="presentationLogin">
-			<aui:column columnWidth="70">
-				<div style="height: 28px; display:table-cell; vertical-align:bottom;">
-				Hi <strong><c:out
-						value="<%=((User) request.getAttribute(WebKeys.USER)).getFirstName() %>"></c:out>
-				</strong>
-				</div>
-			</aui:column>
-		</div>
-	</aui:fieldset>
-<br/><br/>
-
 <liferay-ui:error key="proxy-download-problem"
 	message="proxy-download-problem" />
 
 <aui:form name="addUserInfoForm" commandName="userInfo"
 	action="${getProxyUrl}">
 	
-	<aui:input name="isDM" type="hidden" value="false"/>
+	<aui:input name="isDM" type="hidden" value="true"/>
 
 	<aui:layout>
 	
 		<aui:fieldset>
 
 			<aui:column>
-				Insert the password set during the registration.<br/><br/>
-				Your VO is <strong><c:out value="${Vo.vo }"></c:out></strong>
-				<br/>
+				Insert the password set during the registration.<br/>
 				<aui:input name="vosId" type="hidden"
 								value="${Vo.idVo}" />
 					
