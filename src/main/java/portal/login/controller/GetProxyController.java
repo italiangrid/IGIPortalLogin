@@ -296,7 +296,7 @@ public class GetProxyController {
 				
 				
 				
-				if(isDM.equals("true")){
+				if(isDM!=null && isDM.equals("true")){
 					response.setRenderParameter("myaction", "successDM");
 				}else{
 					response.setRenderParameter("myaction", "home");
