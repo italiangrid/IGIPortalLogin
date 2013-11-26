@@ -2,6 +2,7 @@ package portal.login.server;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -233,15 +234,47 @@ public class Notificator implements Runnable {
 	}
 
 	private void sendMail(String mail, String user, int limit, String voName) {
-
-		String text = "Dear "
-				+ user
-				+ ",\n your proxy will expire in "
-				+ limit
-				+ " minutes.\n\n If necessary renew the proxy on https://portal.italiangrid.it \n\n [If you don't want to receive this mail go to Advanced option into My Data page and uncheck che option.] \n\n      - Portal Administrators";
-		SendMail sm = new SendMail("igi-portal-admin@lists.italiangrid.it",
-				mail, "Proxy Expiration for " + voName, text);
+		LoadProperties props = new LoadProperties("content/MyProxy.properties");
+		String sender = props.getValue("notificator.mail.sender");
+		
+		String text;
+		try {
+			text = readFile(props.getValue("notificator.mail.text.file"));
+			text = text.replaceAll("##USER##", user);
+			text = text.replaceAll("##LIMIT##", String.valueOf(limit));
+			text = text.replaceAll("##HOST##", props.getValue("portal.url"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			text = "Dear "
+					+ user
+					+ ",\n your proxy will expire in "
+					+ limit
+					+ " minutes.\n\n If necessary renew the proxy on https://portal.italiangrid.it \n\n [If you don't want to receive this mail go to Advanced option into My Data page and uncheck che option.] \n\n      - Portal Administrators";
+		}
+		
+		String subject = props.getValue("notificator.mail.subject") + " " + voName;
+		
+		SendMail sm = new SendMail(sender,
+				mail, subject, text);
 		sm.send();
+	}
+	
+	private String readFile(String fileName) throws IOException {
+	    BufferedReader br = new BufferedReader(new FileReader(LoadProperties.class.getClassLoader().getResource("").getPath() + fileName));
+	    try {
+	        StringBuilder sb = new StringBuilder();
+	        String line = br.readLine();
+
+	        while (line != null) {
+	            sb.append(line);
+	            sb.append("\n");
+	            line = br.readLine();
+	        }
+	        return sb.toString();
+	    } finally {
+	        br.close();
+	    }
 	}
 
 }

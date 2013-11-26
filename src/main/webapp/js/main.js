@@ -46,7 +46,11 @@ function goLogin() {
 			overlayOpacity: .85, // Use this value if not set in CSS or HTML
 			id: 'modal',
 			fadeInSpeed: 0,
-			fadeOutSpeed: 0
+			fadeOutSpeed: 0,
+			src: function (sender) {
+				return jQuery(sender).attr('href');
+			},
+			redirect: null
 		};
 
 		/**********************************
@@ -77,7 +81,8 @@ function goLogin() {
 				imageClassName: null,
 				closeClassName: null,
 				overlayClassName: null,
-				src: null
+				src: null,
+				redirect: null
 			};
 			this.options = $.extend({}, options, _defaults);
 			this.options = $.extend({}, options, _settings);
@@ -123,8 +128,8 @@ function goLogin() {
 					//$close.click(function () { jQuery.modal().close(); location.href='https://halfback.cnaf.infn.it/casshib/shib/app4/login?service=https%3A%2F%2Fgridlab04.cnaf.infn.it%2Fc%2Fportal%2Flogin%3Fp_l_id%3D10671';});
 					$close.click(function () { jQuery.modal().close(); location.href='https://halfback.cnaf.infn.it/casshib/shib/app1/login?service=https%3A%2F%2Fflyback.cnaf.infn.it%2Fc%2Fportal%2Flogin%3Fp_l_id%3D10669';});
 					}else{
-						$close.click(function () { window.location.href=window.location.href;});
-						$overlay.click(function () { window.location.href=window.location.href; });
+						$close.click(function () { window.location.href=window.location.href.split('?')[0];});
+						$overlay.click(function () { window.location.href=window.location.href.split('?')[0]; });
 					}
 					
 				}

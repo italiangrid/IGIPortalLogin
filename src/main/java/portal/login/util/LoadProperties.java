@@ -22,7 +22,7 @@ public class LoadProperties {
 				.getResource("").getPath();
 
 		File test = new File(contextPath + file);
-		log.info("File proeprties notificator: " + test.getAbsolutePath());
+		log.info("File properties notificator: " + test.getAbsolutePath());
 
 		if (test.exists()) {
 			log.info("Properties found: " + contextPath + file);

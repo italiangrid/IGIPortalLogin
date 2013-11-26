@@ -5,7 +5,14 @@
 <!--
 	//-->
 	
+$(document).ready(function() {
 	
+	$("#submitThis").submit();
+	
+	document.closeFrame = function(){  
+		window.location.href=window.location.href.split('?')[0];
+	};
+});	
 
 	
 </script>
@@ -53,12 +60,40 @@
 
 #proxy{
 	float: left;
-	border: 1px solid green;
 	border-radius: 5px;
 	padding: 5px;
 	margin: 10px 5px 5px 5px;
-	background-color: LightGreen;
 	cursor: pointer;
+}
+
+.green{
+	border: 1px solid green;
+	background-color: #66CC66;
+}
+.yellow{
+	border: 1px solid #FFCC00;
+	background-color: #FFFFCC;
+}
+.orange{
+	border: 1px solid orange;
+	background-color: #FFCC66;
+}
+.red{
+	border: 1px solid red;
+	background-color: red;
+}
+
+.green:hover{
+	background-color: #99FF66;
+}
+.yellow:hover{
+	background-color: #FFFF66;
+}
+.orange:hover{
+	background-color: #FF9933;
+}
+.red:hover{
+	background-color: red;
 }
 
 #noproxy{
@@ -104,20 +139,6 @@
 	<c:if test="<%= !themeDisplay.isSignedIn() %>">
 		<div id="containerLogin" style="margin-bottom: 10px;">
 		<span style="color:red"><strong>Effettua il Login per visualizzare le tue informazioni.</strong></span>
-		<div id="<portlet:namespace/>soloAdmin" style="display: none;">
-			<aui:select id="idpId" name="idpId" label="IDP" onChange="goLogin();">
-	
-				<aui:option value="">
-					<liferay-ui:message key="Seleziona IDP per Login" />
-				</aui:option>
-				<c:forEach var="idpi" items="${idps}">
-					<aui:option value="${idpi.idploginAddress}">
-						<liferay-ui:message key="${idpi.idpname}" />
-					</aui:option>
-				</c:forEach>
-	
-			</aui:select>
-		</div>
 		</div>
 	</c:if>
 	
@@ -126,90 +147,90 @@
 		<c:if test="${!proxyDownloaded}">
 		
 			<div id="containerLogin" style="margin-bottom: 10px;">
-			
-			<aui:fieldset>
-			<div id="presentationLogin">
-				<aui:column columnWidth="70">
-					<div style="height: 28px; display:table-cell; vertical-align:bottom;">
-					Hi <strong><c:out
-							value="<%=((User) request.getAttribute(WebKeys.USER)).getFirstName() %>"></c:out>
-					</strong>
-					</div>
-				</aui:column>
-				<aui:column columnWidth="30">
-					<div id="linkImg">
-						<aui:a href="${vaiqui}" onmouseover="viewTooltip('#settings');"><img src="<%=request.getContextPath()%>/images/advancedsettings.png" alt="User settings" width="24" height="24" style="float: right; padding-right:10px;" /></aui:a>
-					</div>
-				</aui:column>
-			</div>
-		</aui:fieldset>
-		
 				
-		<br/> <br/>
-		
-		<liferay-ui:success key="proxy-download-success"
-		message="proxy-download-success" />
-	<liferay-ui:success key="proxy-destroy-success"
-		message="proxy-destroy-success" />
-	<liferay-ui:success key="proxy-expired-deleted"
-		message="proxy-expired-deleted" />
-	
-	<liferay-ui:error key="proxy-download-problem"
-		message="proxy-download-problem" />
+				<aui:fieldset>
+				<div id="presentationLogin">
+					<aui:column columnWidth="70">
+						<div style="height: 28px; display:table-cell; vertical-align:bottom;">
+						Hi <strong><c:out
+								value="<%=((User) request.getAttribute(WebKeys.USER)).getFirstName() %>"></c:out>
+						</strong>
+						</div>
+					</aui:column>
+					<aui:column columnWidth="30">
+						<div id="linkImg">
+							<aui:a href="${vaiqui}" onmouseover="viewTooltip('#settings');"><img src="<%=request.getContextPath()%>/images/advancedsettings.png" alt="User settings" width="24" height="24" style="float: right; padding-right:10px;" /></aui:a>
+						</div>
+					</aui:column>
+				</div>
+			</aui:fieldset>
 			
-			<c:choose>
+					
+			<br/> <br/>
 			
-				<c:when test="${voNumber == 0 }">
-					<br/>
-					<div class="portlet-msg-error"> None of your VOs is enabled in the portal yet.</div>
-					<p>Check your settings <a href="${vaiqui }">HERE</a>.</p>
-					
-					
-					
-				</c:when>
-				<c:when test="${voNumber == 1 }">
-					
-					<br/> 
-					
-					<div class="portlet-msg-error"> None VOs in use. Click the button below to retrieve your credentials.</div>
-					
-					<br/>
-					
-					<aui:form name="addUserInfoForm" commandName="userInfo" action="${getProxyUrl}">
-		
+			<liferay-ui:success key="proxy-download-success"
+				message="proxy-download-success" />
+			<liferay-ui:success key="proxy-destroy-success"
+				message="proxy-destroy-success" />
+			<liferay-ui:success key="proxy-expired-deleted"
+				message="proxy-expired-deleted" />
+			
+			<liferay-ui:error key="proxy-download-problem"
+				message="proxy-download-problem" />
+				
+				<c:choose>
+				
+					<c:when test="${voNumber == 0 }">
+						<br/>
+						<div class="portlet-msg-error"> None of your VOs is enabled in the portal yet.</div>
+						<p>Check your settings <a href="${vaiqui }">HERE</a>.</p>
 						
-		
-						<aui:button-row>
-							<liferay-portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>" var="downloadProxy">
-							<portlet:param name="myaction" value="downloadCertificate" />
-							</liferay-portlet:renderURL>
-							<aui:button type="button" value="Get Credentials" onclick="$(this).modal({width:400, height:300, message:true, src: '${downloadProxy }'}).open(); return false;"/>	
-					
-						</aui:button-row>
-					</aui:form>
-				</c:when>
-				<c:otherwise>
-					
-					<br/> 
-					
-					<div class="portlet-msg-error"> None VOs in use. Click the button below to retrieve your credentials.</div>
-					
-					<br/>
-					 
-					<aui:form name="catalogForm"
-							action="${downloadCertificateUrl}">
+						
+						
+					</c:when>
+					<c:when test="${voNumber == 1 }">
+						
+						<br/> 
+						
+						<div class="portlet-msg-error"> None VOs in use. Click the button below to retrieve your credentials.</div>
+						
+						<br/>
+						
+						<aui:form name="addUserInfoForm" commandName="userInfo" action="${getProxyUrl}">
+			
 							
-								<aui:button-row>
-										<liferay-portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>" var="downloadProxy">
-										<portlet:param name="myaction" value="downloadCertificate" />
-										</liferay-portlet:renderURL>
-										<aui:button type="button" value="Get Credentials" onclick="$(this).modal({width:400, height:300, message:true, src: '${downloadProxy }'}).open(); return false;"/>	
-					
-								</aui:button-row>
-							
-					</aui:form>
-				</c:otherwise>
-			</c:choose>
+			
+							<aui:button-row>
+								<liferay-portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>" var="downloadProxy">
+								<portlet:param name="myaction" value="downloadCertificate" />
+								</liferay-portlet:renderURL>
+								<aui:button type="button" value="Get Credentials" onclick="$(this).modal({width:400, height:300, message:true, src: '${downloadProxy }'}).open(); return false;"/>	
+						
+							</aui:button-row>
+						</aui:form>
+					</c:when>
+					<c:otherwise>
+						
+						<br/> 
+						
+						<div class="portlet-msg-error"> None VOs in use. Click the button below to retrieve your credentials.</div>
+						
+						<br/>
+						 
+						<aui:form name="catalogForm"
+								action="${downloadCertificateUrl}">
+								
+									<aui:button-row>
+											<liferay-portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>" var="downloadProxy">
+											<portlet:param name="myaction" value="downloadCertificate" />
+											</liferay-portlet:renderURL>
+											<aui:button type="button" value="Get Credentials" onclick="$(this).modal({width:400, height:300, message:true, src: '${downloadProxy }'}).open(); return false;"/>	
+						
+									</aui:button-row>
+								
+						</aui:form>
+					</c:otherwise>
+				</c:choose>
 			</div>
 		</c:if>
 	
@@ -220,7 +241,41 @@
 							value="<%=((User) request.getAttribute(WebKeys.USER)).getFirstName() %>"></c:out>, your active VO:</strong>
 				</div>
 				<c:forEach var="s" items="${shortProxies }">
-					<div id="proxy" onclick="$('#details').show(); $('#shortDetails').hide();"><strong>${s }</strong></div>
+					<!-- <div id="proxy" class="green" onclick="$('#details').show(); $('#shortDetails').hide();"><strong>${s }</strong></div> -->
+					<c:if test="${fn:split(s,'|')[1] == 'green' }">
+						<liferay-portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>" var="RenewProxy">
+							<portlet:param name="myaction" value="showRenewProxy" />
+							<portlet:param name="idVo" value="${fn:split(s,'|')[2] }" />
+						</liferay-portlet:renderURL>
+						<div id="proxy" class="green" onclick="$(this).modal({width:400, height:300, message:true, src: '${RenewProxy }'}).open();"><strong>${fn:split(s,'|')[0] }</strong></div>
+					</c:if>
+					<c:if test="${fn:split(s,'|')[1] == 'yellow' }">
+						<liferay-portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>" var="RenewProxy">
+							<portlet:param name="myaction" value="showRenewProxy" />
+							<portlet:param name="idVo" value="${fn:split(s,'|')[2] }" />
+						</liferay-portlet:renderURL>
+						<div id="proxy" class="yellow" onclick="$(this).modal({width:400, height:300, message:true, src: '${RenewProxy }'}).open();"><strong>${fn:split(s,'|')[0] }</strong></div>
+					</c:if>
+					<c:if test="${fn:split(s,'|')[1] == 'orange' }">
+					<liferay-portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>" var="RenewProxy">
+							<portlet:param name="myaction" value="showRenewProxy" />
+							<portlet:param name="idVo" value="${fn:split(s,'|')[2] }" />
+						</liferay-portlet:renderURL>
+						<div id="proxy" class="orange" onclick="$(this).modal({width:400, height:300, message:true, src: '${RenewProxy }'}).open();"><strong>${fn:split(s,'|')[0] }</strong></div>
+					</c:if>
+					<c:if test="${fn:split(s,'|')[1] == 'black' }">
+						<liferay-portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>" var="autoRenewProxy">
+							<portlet:param name="myaction" value="showRenewProxyExp" />
+							<portlet:param name="idVo" value="${fn:split(s,'|')[2] }" />
+						</liferay-portlet:renderURL>
+						<div id="proxy" class="red" onclick="$('#details').show(); $('#shortDetails').hide();"><strong>${fn:split(s,'|')[0] }</strong>
+							<div style="display:none">
+								<form id="submitThis" action="javascript:$(this).modal({width:400, height:300, message:true, src: '${autoRenewProxy }'}).open();"></form>
+							</div>
+						</div>
+						
+					</c:if>
+					
 				</c:forEach>
 				<c:if test="${fn:length(shortProxies) < voNumber}">
 					<div id="noproxy">
@@ -339,7 +394,22 @@
 	
 	
 	<div class="portlet-msg-success"> Proxy downloaded successfully<br/> Close this pop-up. </div>
-	
+	<script>
+		var count=3;
+		
+		var counter=setInterval(timer, 1000); //1000 will  run it every 1 second
+		
+		function timer(){
+			count=count-1;
+			if (count <= 0){
+				clearInterval(counter);
+				window.parent.document.closeFrame();
+				return;
+			}
+			$("#timer").html(count); // watch for spelling
+		}
+	</script>
+	This Pop-up will be closed in <strong><span id="timer">5</span></strong> secs.
 	
 	</div>
 </c:if>

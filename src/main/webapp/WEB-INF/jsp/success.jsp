@@ -26,5 +26,7 @@
 
 <div class="portlet-msg-success"> Proxy downloaded successfully<br/> Close this pop-up. </div>
 
+<input type="button" value="Say Hello!!" onclick="$(document, parent.window.document).trigger('myCustomTrigger');">
+
 
 </div>

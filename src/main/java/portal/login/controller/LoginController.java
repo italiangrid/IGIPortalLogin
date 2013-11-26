@@ -474,8 +474,20 @@ public class LoginController {
 			for(Vo vo: vos){
 				File proxy = new File(proxyPrefix+vo.getVo());
 				
-				if(proxy.exists())
-					result.add(vo.getVo());
+				if(proxy.exists()){
+					
+					long totalSecs = getExpirationTime(proxy.getAbsolutePath());
+					long hours = totalSecs / 3600;
+					String color = "green";
+					if(hours<5)
+						color = "yellow";
+					if(hours<2)
+						color = "orange";
+					if(hours<1)
+						color = "black";
+					result.add(vo.getVo()+"|"+color+"|"+vo.getIdVo());
+//					result.add(vo.getVo());
+				}
 			}
 			
 		}

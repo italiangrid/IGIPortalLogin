@@ -48,7 +48,8 @@ public class SendMail {
 			simpleMessage.setFrom(fromAddress);
 			simpleMessage.setRecipient(RecipientType.TO, toAddress);
 			simpleMessage.setSubject(subject);
-			simpleMessage.setText(text);
+			//simpleMessage.setText(text);
+			simpleMessage.setContent(text, "text/html; charset=utf-8");
  
 			Transport.send(simpleMessage);
 		} catch (MessagingException e) {

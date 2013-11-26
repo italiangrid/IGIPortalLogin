@@ -1,0 +1,16 @@
+<html>
+	<head></head>
+	<body>
+	<div style=background-color:white;margin-left:auto;margin-right:auto;margin-top:10px;margin-top:15px;margin-bottom:15px;>
+			<div style=padding-left:10px;padding-top:10px;><a href='https://portal.italiangrid.it'><img src='http://portal-se.cnaf.infn.it/ajp/plugins/access.lfc/logo.png' width='80px' height='40px' alt='' /></a></div> 
+			<div style=margin-top:10px;margin-bottom:10px;color:black;padding-left:10px;padding-right:10px;>
+				<p>Dear ##USER##,</br></br> your proxy will expire in ##LIMIT## minutes.<br/><br/>If necessary renew the proxy on <a href="##HOST##">##HOST##</a>.<br/><br/>
+				[If you don't want to receive this mail: go to My Data page and in Advanced Options uncheck the option.]<br/><br/>      - Portal Administrators
+				<p/>
+			</div>
+		    <div style=margin-top:20px;margin-bottom:20px;color:black;padding-left:10px;padding-right:10px;>
+		        Need assistance? Replay this mail to <a tabindex='120' href='mailto:igi-portal-admin@lists.italiangrid.it'>Administrators</a>.
+		    </div>
+	</div>
+	</body>
+</html>

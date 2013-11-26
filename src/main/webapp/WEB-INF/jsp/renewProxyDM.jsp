@@ -1,5 +1,23 @@
 <%@ include file="/WEB-INF/jsp/init.jsp"%>
 
+<style type="text/css">
+
+.green{
+	color: #66CC66;
+}
+.yellow{
+	color: #FFCC00;
+}
+.orange{
+	color: #FF9933;
+}
+.red{
+	color: red;
+}
+
+
+</style>
+
 <div id="containerLogin2">
 
 <portlet:actionURL var="getProxyUrl">
@@ -23,6 +41,7 @@
 		<aui:fieldset>
 
 			<aui:column>
+				<strong>Timeleft for VO ${Vo.vo }: <span class="${fn:split(timeLeft,'|')[1]}">${fn:split(timeLeft,'|')[0] }</span></strong><br/><br/>
 				Insert the password set during the registration.<br/>
 				<aui:input name="vosId" type="hidden"
 								value="${Vo.idVo}" />

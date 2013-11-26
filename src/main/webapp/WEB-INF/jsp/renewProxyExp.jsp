@@ -1,23 +1,5 @@
 <%@ include file="/WEB-INF/jsp/init.jsp"%>
 
-<style type="text/css">
-
-.green{
-	color: #66CC66;
-}
-.yellow{
-	color: #FFCC00;
-}
-.orange{
-	color: #FF9933;
-}
-.red{
-	color: red;
-}
-
-
-</style>
-
 <div id="containerLogin2">
 
 <portlet:actionURL var="getProxyUrl">
@@ -27,19 +9,6 @@
 <portlet:renderURL var="homeUrl">
 	<portlet:param name="myaction" value="idps" />
 </portlet:renderURL>
-
-<aui:fieldset>
-		<div id="presentationLogin">
-			<aui:column columnWidth="70">
-				<div style="height: 28px; display:table-cell; vertical-align:bottom;">
-				Hi <strong><c:out
-						value="<%=((User) request.getAttribute(WebKeys.USER)).getFirstName() %>"></c:out>
-				</strong>
-				</div>
-			</aui:column>
-		</div>
-	</aui:fieldset>
-<br/><br/>
 
 <liferay-ui:error key="proxy-download-problem"
 	message="proxy-download-problem" />
@@ -54,10 +23,11 @@
 		<aui:fieldset>
 
 			<aui:column>
-				
-				<strong>Timeleft for Vo ${Vo.vo }: <span class="${fn:split(timeLeft,'|')[1]}">${fn:split(timeLeft,'|')[0] }</span></strong><br/><br/>
-				Insert the password set during the registration.
 				<br/>
+				<span style="color: red; font-size: 14px; text-decoration: underline;"><strong>ATTENTION</strong></span>
+				<br/><br/>
+				Your credential for the VO <strong>${Vo.vo}</strong> is near to expiration.<br/>
+				Insert the password set during the registration.<br/>
 				<aui:input name="vosId" type="hidden"
 								value="${Vo.idVo}" />
 					
