@@ -412,7 +412,7 @@ public class LoginController {
 		long result = 0;
 
 		try {
-			String cmd = "voms-proxy-info -actimeleft -file " + proxyFile;
+			String cmd = "voms-proxy-info -timeleft -file " + proxyFile;
 
 			log.info("cmd = " + cmd);
 			Process p = Runtime.getRuntime().exec(cmd);
