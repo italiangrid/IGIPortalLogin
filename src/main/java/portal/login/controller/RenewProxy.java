@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.List;
 import java.util.Properties;
 
 import javax.portlet.RenderRequest;
@@ -22,13 +21,6 @@ import org.springframework.web.portlet.bind.annotation.RenderMapping;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.User;
 
-//import portal.login.domain.UserInfo;
-//import portal.login.domain.UserToVo;
-//import portal.login.domain.Vo;
-//import portal.login.services.UserInfoService;
-//import portal.login.services.UserToVoService;
-//import portal.login.services.VoService;
-
 import it.italiangrid.portal.dbapi.domain.UserInfo;
 import it.italiangrid.portal.dbapi.domain.UserToVo;
 import it.italiangrid.portal.dbapi.domain.Vo;
@@ -41,8 +33,7 @@ import it.italiangrid.portal.dbapi.services.VoService;
 public class RenewProxy {
 	
 	/**
-	 * Logger of the class DownloadCertificateController. TODO to substitute it
-	 * with slf4j.
+	 * Logger of the class DownloadCertificateController. 
 	 */
 	private static final Logger log = Logger
 			.getLogger(RenewProxy.class);
@@ -196,7 +187,6 @@ public class RenewProxy {
 				result = prop.getProperty("mydata.url");
 
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
