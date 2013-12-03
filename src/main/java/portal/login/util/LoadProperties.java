@@ -29,7 +29,14 @@ public class LoadProperties {
 			
 		}else{
 			log.error("Properties not found: " + contextPath + file + ". Cretating new file.");
+			String folder = contextPath + file;
+			folder = folder.substring(0,folder.lastIndexOf("/"));
+			File folderFile = new File(folder);
+			
 			try {
+				if(!folderFile.exists())
+					folderFile.mkdirs();
+				
 				test.createNewFile();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block

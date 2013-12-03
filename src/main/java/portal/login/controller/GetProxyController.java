@@ -242,18 +242,8 @@ public class GetProxyController {
 			Util.setFilePermissions(proxyFile.toString(), 600);
 			globusCred.save(out);
 			
-			/*GlobusCredential myproxyCred = null;
-			myproxyCred = ((GlobusGSSCredentialImpl) myproxy)
-					.getGlobusCredential();
-			out = new FileOutputStream(myproxyFile);
-			Util.setFilePermissions(myproxyFile.toString(), 600);
-			myproxyCred.save(out);*/
-			
 			boolean proxyinit = myMyProxyInit(proxyFile.toString(), hostGrid, cert.getSubject(), pass, request);
 			
-			//myproxyFile.delete();
-			
-			//myVomsProxyInit(proxyFile.toString(), selectedVo.getVo(), role, request);
 
 			out = new FileOutputStream(proxyFileVO);
 			Util.setFilePermissions(proxyFileVO.toString(), 600);
@@ -273,7 +263,6 @@ public class GetProxyController {
 			outcred.write(System.currentTimeMillis()
 					+ ";"+host+";" + globusCred.getTimeLeft()
 					+ "; ;#" + selectedVo.getVo() + " ;\n");
-			// Close the output stream
 			outcred.close();
 			
 			if(proxyinit&&vomsproxyinit){
@@ -284,7 +273,7 @@ public class GetProxyController {
 				log.debug("@@@@" + n.getProxyExpire());
 				log.debug("@@@@ TEST @@@@");
 				
-				LoadProperties props = new LoadProperties("checkProxy.properties");
+				LoadProperties props = new LoadProperties("../../../ProxyTempDir/checkProxy.properties");
 				if(n.getProxyExpire().equals("true")){
 					log.debug("è richiesta la notifica");
 					
@@ -301,14 +290,6 @@ public class GetProxyController {
 				}else{
 					response.setRenderParameter("myaction", "home");
 				}
-//				String completeurl = PortalUtil.getCurrentCompleteURL(PortalUtil.getHttpServletRequest(request));
-//				log.error(completeurl);
-//				
-//				String url = completeurl.substring(0, completeurl.indexOf("?"));
-//				
-//				log.error(url);
-//				
-//				response.sendRedirect(url);
 				
 			} else {
 				SessionErrors.add(request, "proxy-download-problem");
@@ -337,7 +318,7 @@ public class GetProxyController {
 			
 			SessionErrors.add(request, "proxy-download-problem");
 			log.error("***** errore myproxy IllegalArgumentException *****");
-			if(isDM.equals("true")){
+			if(isDM!=null&&isDM.equals("true")){
 				response.setRenderParameter("myaction", "showRenewProxyDM");
 			}else{
 				response.setRenderParameter("myaction", "showRenewProxy");
@@ -461,8 +442,6 @@ public class GetProxyController {
 				log.debug("[Stdout] " + line);
 			}
 			output.close();
-			
-			//boolean error = false;
 
 			BufferedReader brCleanUp = new BufferedReader(
 					new InputStreamReader(stderr));
@@ -472,8 +451,6 @@ public class GetProxyController {
 					log.error("[Stderr] " + line);
 				}
 			}
-			/*if(error)
-				SessionErrors.add(request, "voms-proxy-init-problem");*/
 			brCleanUp.close();
 			
 			return true;

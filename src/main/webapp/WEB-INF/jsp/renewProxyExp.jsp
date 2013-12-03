@@ -26,6 +26,11 @@
 				<br/>
 				<span style="color: red; font-size: 14px; text-decoration: underline;"><strong>ATTENTION</strong></span>
 				<br/><br/>
+				<strong>Timeleft for VO ${Vo.vo }: <span class="${fn:split(timeLeft,'|')[1]}">${fn:split(timeLeft,'|')[0] }</span></strong><br/>
+				<c:if test="${fn:split(timeLeft,'|')[2] != 'no role' }">
+					<strong>Setted role: ${fn:split(timeLeft,'|')[2] }</strong><br/>
+				</c:if>
+				<br/>
 				Your credential for the VO <strong>${Vo.vo}</strong> is near to expiration.<br/>
 				Insert the password set during the registration.<br/>
 				<aui:input name="vosId" type="hidden"

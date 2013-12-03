@@ -6,6 +6,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.portlet.RenderRequest;
@@ -106,6 +108,7 @@ public class RenewProxy {
 		Vo vo =  voService.findById(idVo);
 		
 		User user = (User)request.getAttribute(WebKeys.USER);
+		UserInfo userInfo = userInfoService.findByMail(user.getEmailAddress());
 		if(user!=null){
 			
 			String dir = System.getProperty("java.io.tmpdir");
@@ -120,15 +123,15 @@ public class RenewProxy {
 				long minutes = (totalSecs % 3600) / 60;
 				long seconds = totalSecs % 60;
 				
-				String color = "green";
+				String color = "greenText";
 				if(hours<5)
-					color = "yellow";
+					color = "yellowText";
 				if(hours<2)
-					color = "orange";
+					color = "orangeText";
 				if(hours<1)
-					color = "red";
-				
-				return hours + ":" + minutes +  ":" + seconds+"|"+color;
+					color = "redText";
+				String role = getRole(userInfo, vo, proxyVoFile.getAbsolutePath());
+				return hours + ":" + minutes +  ":" + seconds+"|"+color + "|" + role;
 			}
 			
 		}
@@ -156,15 +159,6 @@ public class RenewProxy {
 	@ModelAttribute("vaiqui")
 	public String getMydataUrl() {
 
-		/*
-		 * 1 prendi file
-		 * 2 leggi prop proxy.expiration.times
-		 * 3 parsa e metti in array
-		 */
-		
-		
-		//1
-		
 		String contextPath = LoginController.class.getClassLoader()
 				.getResource("").getPath();
 		
@@ -183,7 +177,6 @@ public class RenewProxy {
 
 				inStream.close();
 				
-				//2
 				result = prop.getProperty("mydata.url");
 
 			} catch (IOException e) {
@@ -217,12 +210,6 @@ public class RenewProxy {
 			while ((line = output.readLine()) != null) {
 				log.info("[Stdout] " + line);
 				totalSecs = Long.parseLong(line);
-				
-//				long hours = totalSecs / 3600;
-//				long minutes = (totalSecs % 3600) / 60;
-//				long seconds = totalSecs % 60;
-//
-//				long[] newResult = { hours, minutes, seconds };
 				result = totalSecs;
 				
 			}
@@ -244,6 +231,68 @@ public class RenewProxy {
 		}
 
 		return result;
+	}
+	
+	private String getRole(UserInfo userInfo, Vo vo, String proxyFile){
+		String role="no role";
+		try {
+			
+			UserToVo utv = userToVoService.findById(userInfo.getUserId(), vo.getIdVo());
+			
+			String toParse = utv.getFqans();
+			String roles[]=null;
+			if(toParse!=null){
+				roles=toParse.split(";");
+			}
+			
+			String cmd = "voms-proxy-info -all -file " + proxyFile;
+			
+			log.info("cmd = " + cmd);
+			Process p = Runtime.getRuntime().exec(cmd);
+			InputStream stdout = p.getInputStream();
+			InputStream stderr = p.getErrorStream();
+
+			BufferedReader output = new BufferedReader(new InputStreamReader(
+					stdout));
+			String line = null;
+			
+			List<String> tmpRole = new ArrayList<String>();
+			
+			
+			while ((line = output.readLine()) != null) {
+				log.info("[Stdout] " + line);
+				if(roles!=null){
+					if(line.contains("/"+vo.getVo()+"/Role=NULL")){
+						tmpRole.add(role);
+						log.info("trovato: "+ role);
+					}
+					for(int i=0; i<roles.length; i++){
+						if(line.contains(roles[i].trim())){
+							tmpRole.add(roles[i].trim());
+							log.info("trovato: "+ roles[i]);
+						}
+					}
+				}
+			}
+			if(!tmpRole.isEmpty())
+				role=tmpRole.get(0);
+			log.info("Fine trovato: "+ role);
+			output.close();
+
+			BufferedReader brCleanUp = new BufferedReader(
+					new InputStreamReader(stderr));
+			while ((line = brCleanUp.readLine()) != null) {
+				log.error("[Stderr] " + line);
+			}
+			brCleanUp.close();
+			
+			
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return role;
 	}
 
 }

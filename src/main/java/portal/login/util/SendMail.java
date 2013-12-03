@@ -17,12 +17,14 @@ public class SendMail {
 	private String to;
 	private String subject;
 	private String text;
+	private boolean isHtml;
  
-	public SendMail(String from, String to, String subject, String text){
+	public SendMail(String from, String to, String subject, String text, boolean isHtml){
 		this.from = from;
 		this.to = to;
 		this.subject = subject;
 		this.text = text;
+		this.isHtml = isHtml;
 	}
  
 	public void send(){
@@ -48,9 +50,12 @@ public class SendMail {
 			simpleMessage.setFrom(fromAddress);
 			simpleMessage.setRecipient(RecipientType.TO, toAddress);
 			simpleMessage.setSubject(subject);
-			//simpleMessage.setText(text);
-			simpleMessage.setContent(text, "text/html; charset=utf-8");
- 
+			
+			if(isHtml)
+				simpleMessage.setContent(text, "text/html; charset=utf-8");
+			else
+				simpleMessage.setText(text);
+			
 			Transport.send(simpleMessage);
 		} catch (MessagingException e) {
 			// TODO Auto-generated catch block

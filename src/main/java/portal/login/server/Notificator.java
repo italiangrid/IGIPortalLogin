@@ -19,7 +19,7 @@ public class Notificator implements Runnable {
 		try {
 			log.info("############## NOTIFICATOR ##############"); 
 
-			LoadProperties props = new LoadProperties("checkProxy.properties");
+			LoadProperties props = new LoadProperties("../../../ProxyTempDir/checkProxy.properties");
 
 			if (props.getProperties().isEmpty())
 				return;
@@ -203,21 +203,16 @@ public class Notificator implements Runnable {
 			}
 			output.close();
 
-//			boolean error = false;
-
 			BufferedReader brCleanUp = new BufferedReader(
 					new InputStreamReader(stderr));
 			while ((line = brCleanUp.readLine()) != null) {
 				
 				if (!line.contains("....")) {
-					//error = true;
 					log.error("[Stderr] " + line);
 				}
 			}
 
 			brCleanUp.close();
-//			if (error == true)
-//				return false;
 			long[] expirationTime = getExpirationTime(proxyFile,valid);
 			
 			if(expirationTime[3]>1)
@@ -236,7 +231,7 @@ public class Notificator implements Runnable {
 	private void sendMail(String mail, String user, int limit, String voName) {
 		LoadProperties props = new LoadProperties("content/MyProxy.properties");
 		String sender = props.getValue("notificator.mail.sender");
-		
+		boolean isHtml = true;
 		String text;
 		try {
 			text = readFile(props.getValue("notificator.mail.text.file"));
@@ -244,8 +239,8 @@ public class Notificator implements Runnable {
 			text = text.replaceAll("##LIMIT##", String.valueOf(limit));
 			text = text.replaceAll("##HOST##", props.getValue("portal.url"));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			isHtml =  false;
 			text = "Dear "
 					+ user
 					+ ",\n your proxy will expire in "
@@ -256,12 +251,13 @@ public class Notificator implements Runnable {
 		String subject = props.getValue("notificator.mail.subject") + " " + voName;
 		
 		SendMail sm = new SendMail(sender,
-				mail, subject, text);
+				mail, subject, text, isHtml);
 		sm.send();
 	}
 	
 	private String readFile(String fileName) throws IOException {
-	    BufferedReader br = new BufferedReader(new FileReader(LoadProperties.class.getClassLoader().getResource("").getPath() + fileName));
+		log.info("Path mail: " + Notificator.class.getClassLoader().getResource("").getPath() + fileName);
+	    BufferedReader br = new BufferedReader(new FileReader(Notificator.class.getClassLoader().getResource("").getPath() + fileName));
 	    try {
 	        StringBuilder sb = new StringBuilder();
 	        String line = br.readLine();

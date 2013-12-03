@@ -32,3 +32,123 @@
 #proxyTable{
 	width: 100%;
 }
+
+.modal-overlay {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	background: url(/Login-1.1/images/overlay2.png) repeat;
+	opacity: .85;
+	filter: alpha(opacity=85);
+	z-index: 101;
+}
+.modal-window {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	margin: 0;
+	padding: 0;
+	z-index: 102;
+	background: #fff;
+	border: solid 8px #000;
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+}
+.close-window {
+	position: absolute;
+	width: 47px;
+	height: 47px;
+	right: -23px;
+	top: -23px;
+	background: transparent url(/Login-1.1/images/close-button2.png) no-repeat scroll right top;
+	text-indent: -99999px;
+	overflow: hidden;
+	cursor: pointer;
+}
+
+#proxy{
+	float: left;
+	border-radius: 5px;
+	padding: 5px;
+	margin: 10px 5px 5px 5px;
+	cursor: pointer;
+}
+
+#notproxy{
+	float: left;
+	border-radius: 5px;
+	padding: 5px;
+	margin: 10px 5px 5px 5px;
+}
+
+.green{
+	border: 1px solid green;
+	background-color: #66CC66;
+}
+.yellow{
+	border: 1px solid #FFCC00;
+	background-color: #FFFFCC;
+}
+.orange{
+	border: 1px solid orange;
+	background-color: #FFCC66;
+}
+.red{
+	border: 1px solid red;
+	background-color: #FFDDDD;
+}
+
+.green:hover{
+	background-color: #99FF66;
+}
+.yellow:hover{
+	background-color: #FFFF66;
+}
+.orange:hover{
+	background-color: #FF9933;
+}
+
+.greenText{
+	color: #66CC66;
+}
+.yellowText{
+	color: #FFCC00;
+}
+.orangeText{
+	color: #FF9933;
+}
+.redText{
+	color: red;
+}
+
+#noproxy{
+	float: left;
+	margin-left: 5px;
+}
+
+#titleProxy{
+	margin: 15px 5px 5px 5px;
+	float: left;
+	font-size:120%;
+	font-weight: bold;
+}
+
+#reset{
+	clear: both;
+}
+
+#shortDetails {
+	border-bottom: 1px solid grey;
+    margin-bottom: 10px;
+}
+
+#linkImgShort{
+	margin: 10px 20px 0 0;
+	float: right;
+}
