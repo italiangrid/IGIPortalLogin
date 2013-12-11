@@ -137,12 +137,12 @@ public class LoginController {
 		return 0;
 	}
 
-	private long getExpirationTime(String proxyFile) {
+	private long getExpirationTime(String proxyFile, String option) {
 
 		long result = 0;
 
 		try {
-			String cmd = "voms-proxy-info -timeleft -file " + proxyFile;
+			String cmd = "voms-proxy-info " + option + " -file " + proxyFile;
 
 			log.info("cmd = " + cmd);
 			Process p = Runtime.getRuntime().exec(cmd);
@@ -205,7 +205,10 @@ public class LoginController {
 				
 				if(proxy.exists()){
 					
-					long totalSecs = getExpirationTime(proxy.getAbsolutePath());
+//					long acTotalSecs = getExpirationTime(proxy.getAbsolutePath(), "-actimeleft");
+//					if(acTotalSecs)
+					
+					long totalSecs = getExpirationTime(proxy.getAbsolutePath(), "-timeleft");
 					long hours = totalSecs / 3600;
 					String color = "green";
 					if(hours<5)

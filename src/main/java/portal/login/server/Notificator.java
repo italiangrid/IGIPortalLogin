@@ -32,13 +32,18 @@ public class Notificator implements Runnable {
 
 				String value = props.getValue(key);
 				log.info(value);
+				
+				String[] values = value.split(";");
 
-				String proxyFile = value.split(";")[0];
-				int limit = Integer.parseInt(value.split(";")[1]);
-				String mail = value.split(";")[2];
-				String user = value.split(";")[3];
-				String valid = value.split(";")[4];
-				String role = value.split(";")[5];
+				String proxyFile = values[0];
+				int limit = Integer.parseInt(values[1]);
+				String mail = values[2];
+				String user = values[3];
+				String valid = values[4];
+				String role = values[5];
+				boolean notify = Boolean.parseBoolean(values[6]);
+				
+				log.info("Notify is: " + notify);
 
 				String voName = key.substring(key.indexOf(".")+1, key.length());
 
@@ -67,18 +72,20 @@ public class Notificator implements Runnable {
 									log.info("Authomatic renewed.");
 								}
 								
-								if(!renewed){
+								if(!renewed && notify){
 									props.putValue(key,value.replace("60", "30"));
 									log.info("60  minutes limit");
 									sendMail(mail, user, limit, voName);
 								}
 								break;
 							case 30:
-								props.deleteValue(key);
-
-								log.info("30  minutes limit");
-
-								sendMail(mail, user, limit, voName);
+								if(notify){
+									props.deleteValue(key);
+	
+									log.info("30  minutes limit");
+									
+									sendMail(mail, user, limit, voName);
+								}
 								break;
 							}
 						}else{

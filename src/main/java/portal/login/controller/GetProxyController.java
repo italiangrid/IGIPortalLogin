@@ -277,10 +277,11 @@ public class GetProxyController {
 				if(n.getProxyExpire().equals("true")){
 					log.debug("è richiesta la notifica");
 					
-					props.putValue(n.getIdNotify()+"."+selectedVo.getVo(), proxyFileVO.toString()+";"+60+";"+userInfo.getMail()+";"+userInfo.getFirstName()+";"+valid+";"+role);
+					props.putValue(n.getIdNotify()+"."+selectedVo.getVo(), proxyFileVO.toString()+";"+60+";"+userInfo.getMail()+";"+userInfo.getFirstName()+";"+valid+";"+role+";true");
 				}else{
 					log.debug("non è richiesta la notifica");
-					props.deleteValue(n.getIdNotify()+"."+selectedVo.getVo());
+//					props.deleteValue(n.getIdNotify()+"."+selectedVo.getVo());
+					props.putValue(n.getIdNotify()+"."+selectedVo.getVo(), proxyFileVO.toString()+";"+60+";"+userInfo.getMail()+";"+userInfo.getFirstName()+";"+valid+";"+role+";false");
 				}
 				
 				
