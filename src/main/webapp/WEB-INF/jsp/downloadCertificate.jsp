@@ -86,7 +86,7 @@
 	action="${getProxyUrl}">
 
 	
-	
+	<aui:input name="isDM" type="hidden" value="false"/>
 		
 
 		<aui:fieldset>

@@ -123,9 +123,9 @@ public class LoginController {
 		
 		
 		if (user != null) {
-			String username = user.getScreenName();
+			String mail = user.getEmailAddress();
 
-			UserInfo userInfo = userInfoService.findByUsername(username);
+			UserInfo userInfo = userInfoService.findByMail(	mail);
 			List<Vo> vos = userToVoService.findVoByUserId(userInfo.getUserId());
 			int count = 0;
 			for(Vo vo: vos){

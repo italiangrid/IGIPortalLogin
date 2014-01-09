@@ -294,7 +294,7 @@ public class GetProxyController {
 				
 			} else {
 				SessionErrors.add(request, "proxy-download-problem");
-				if(isDM.equals("true")){
+				if(isDM!=null&&isDM.equals("true")){
 					response.setRenderParameter("myaction", "showRenewProxyDM");
 				}else{
 					response.setRenderParameter("myaction", "showRenewProxy");
@@ -308,7 +308,7 @@ public class GetProxyController {
 			SessionErrors.add(request, "proxy-download-problem");
 			log.error("***** errore myproxy " + e.getMessage()
 					+ " MyProxyException *****");
-			if(isDM.equals("true")){
+			if(isDM!=null&&isDM.equals("true")){
 				response.setRenderParameter("myaction", "showRenewProxyDM");
 			}else{
 				response.setRenderParameter("myaction", "showRenewProxy");
