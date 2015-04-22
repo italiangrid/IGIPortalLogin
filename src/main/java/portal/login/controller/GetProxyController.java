@@ -227,7 +227,11 @@ public class GetProxyController {
 			}
 			log.debug("certificato: " + usernameCert + " password: "
 					+ pass);
-			GSSCredential proxy = mp.get(usernameCert, pass, 608400);
+			
+			if(mp == null){
+				log.debug("MyProxy is null");
+			}
+			/*GSSCredential proxy = mp.get(usernameCert, pass, 608400);
 			
 			log.debug("----- All ok -----");
 			log.debug("Proxy:" + proxy.toString());
@@ -241,11 +245,14 @@ public class GetProxyController {
 			out = new FileOutputStream(proxyFile);
 			Util.setFilePermissions(proxyFile.toString(), 600);
 			globusCred.save(out);
+			*/
+			
+			boolean proxylogon = myMyProxyLogon(proxyFile.toString(), usernameCert, pass, 608400, request);
 			
 			boolean proxyinit = myMyProxyInit(proxyFile.toString(), hostGrid, cert.getSubject(), pass, request);
 			
 
-			out = new FileOutputStream(proxyFileVO);
+			/*out = new FileOutputStream(proxyFileVO);
 			Util.setFilePermissions(proxyFileVO.toString(), 600);
 			globusCred.save(out);
 			
@@ -253,6 +260,7 @@ public class GetProxyController {
 				valid=n.getProxyExpireTime();
 			
 			log.error("Now Valid is: "+valid);
+			*/
 			
 			boolean vomsproxyinit = myVomsProxyInit(proxyFileVO.toString(), selectedVo.getVo(), role, valid, request);
 
@@ -261,7 +269,7 @@ public class GetProxyController {
 					+ user.getUserId() + "/.creds", true);
 			BufferedWriter outcred = new BufferedWriter(fstream);
 			outcred.write(System.currentTimeMillis()
-					+ ";"+host+";" + globusCred.getTimeLeft()
+					+ ";"+host+";" + valid
 					+ "; ;#" + selectedVo.getVo() + " ;\n");
 			outcred.close();
 			
@@ -302,19 +310,21 @@ public class GetProxyController {
 				response.setRenderParameter("idVo", String.valueOf(selectedVo.getIdVo()));
 			}
 
-		} catch (MyProxyException e) {
+		/*} catch (MyProxyException e) {
 			//e.printStackTrace();
 			
 			SessionErrors.add(request, "proxy-download-problem");
 			log.error("***** errore myproxy " + e.getMessage()
 					+ " MyProxyException *****");
+			e.printStackTrace();
+					
 			if(isDM!=null&&isDM.equals("true")){
 				response.setRenderParameter("myaction", "showRenewProxyDM");
 			}else{
 				response.setRenderParameter("myaction", "showRenewProxy");
 			}
 			response.setRenderParameter("idVo", String.valueOf(selectedVo.getIdVo()));
-
+*/
 		} catch (IllegalArgumentException e) {
 			
 			SessionErrors.add(request, "proxy-download-problem");
@@ -459,6 +469,74 @@ public class GetProxyController {
 		} catch (IOException e) {
 			
 			SessionErrors.add(request, "voms-proxy-init-exception");
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	private boolean myMyProxyLogon(String proxyFile, String username, String password, int valid, ActionRequest request){
+		try {
+			
+			String contextPath = GetProxyController.class.getClassLoader().getResource("").getPath();
+			
+			log.debug("dove sono:" + contextPath);
+			
+			FileInputStream inStream =
+		    new FileInputStream(contextPath + "/content/MyProxy.properties");
+
+			Properties prop = new Properties();
+			prop.load(inStream);
+			inStream.close();
+			
+			String myproxyHost = prop.getProperty("myproxy.storage");
+			
+			String cmd = "myproxy-logon.py " + myproxyHost + " " + username+ " " + valid + " " + proxyFile + " " + password;
+			
+			log.debug("Myproxy-logon command = " + cmd);
+			
+			String[] myproxylogon = {"/usr/bin/python", "/upload_files/myproxy-logon.py", myproxyHost, username, Integer.toString(valid), proxyFile, password};
+			Process p = Runtime.getRuntime().exec(myproxylogon);
+			InputStream stdout = p.getInputStream();
+			InputStream stderr = p.getErrorStream();
+
+			BufferedReader output = new BufferedReader(
+					new InputStreamReader(stdout));
+			String line = null;
+
+			while (((line = output.readLine()) != null)) {
+
+				log.info("[Stdout] " + line);
+				
+				if (line.equals("myproxy success")) {
+					log.info("myproxy ok");
+				} else {
+					if (line.equals("myproxy username failure")) {
+						log.info(line);
+					} else {
+						if (line.equals("myproxy password failure")) {
+							log.info(line);
+						} else {
+							if (line.equals("myproxy password too short")) {
+								log.info(line);
+							}
+						}
+					}
+				}
+			}
+			output.close();
+
+			BufferedReader brCleanUp = new BufferedReader(
+					new InputStreamReader(stderr));
+			while ((line = brCleanUp.readLine()) != null) {
+				log.error("[Stderr] " + line);
+			}
+			brCleanUp.close();
+			
+			return true;
+
+		} catch (IOException e) {
+			
+			SessionErrors.add(request, "myMyProxyInit-exception");
 			e.printStackTrace();
 			return false;
 		}
