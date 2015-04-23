@@ -254,13 +254,13 @@ public class GetProxyController {
 
 			/*out = new FileOutputStream(proxyFileVO);
 			Util.setFilePermissions(proxyFileVO.toString(), 600);
-			globusCred.save(out);
+			globusCred.save(out);*/
 			
 			if(!n.getProxyExpireTime().equals("12:00"))
 				valid=n.getProxyExpireTime();
 			
 			log.error("Now Valid is: "+valid);
-			*/
+			
 			
 			boolean vomsproxyinit = myVomsProxyInit(proxyFileVO.toString(), selectedVo.getVo(), role, valid, request);
 
